@@ -12,13 +12,11 @@ export const GET: RequestHandler = async ({ url }) => {
 
   const params = Object.fromEntries(url.searchParams)
 
-  const topic     = params.topic              ?? ""
-  const limit     = parseInt(params.limit     ?? '5')
-  const threshold = parseInt(params.threshold ?? '0.5')
+  const topic     = params.topic                ?? ""
+  const limit     = parseInt(params.limit       ?? '5')
+  const threshold = parseFloat(params.threshold ?? '0.5')
 
-  log('api/topic', params, topic, limit, threshold)
-
-  log('api/topic', (topic || '[NO TOPIC]'), limit, threshold)
+  log('api/topic', `${topic || '[NO TOPIC]'} (limit ${limit}, thresh ${threshold}`)
 
   let items = (topic === '') ? allItems(limit) : await topicItems(topic, limit, threshold)
 

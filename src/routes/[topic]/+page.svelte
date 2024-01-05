@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
-  import { info } from '$lib/log.client'
+  import { log, info } from '$lib/log.client'
   import { getJson } from '$lib/utils'
 
   import Topic    from '$comp/Topic.svelte';
@@ -21,6 +21,8 @@
     topic = newTopic
     info('topic/getItems', topic)
     items = await getJson('/api/topic/', { topic })
+
+    log('topic/getItems', items[0])
   }
 
   onMount(() => {

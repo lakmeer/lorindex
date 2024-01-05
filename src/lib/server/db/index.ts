@@ -30,22 +30,20 @@ export function allItems (limit:number = DEFAULT_LIMIT):Item[] {
 // Get items with correlated topic
 
 export async function topicItems (topic:string, k = DEFAULT_LIMIT, threshold = 0.5):Promise<Item[]> {
-  info('db/topic', `querying ${topic}, (limit ${k})`)
-
-  // TODO: Threshold control
+  info('db/topic', `query ${topic}, (limit ${k}, thresh ${threshold})`)
 
   const query = await embed(topic)
 
   const items = db.prepare(`
-    select items.* from items join (
+    select items.*, hits.distance, hits.rowid as rowid from items join (
       select rowid, distance
       from vss_items
       where vss_search(embedding, ?)
       limit ?
-    ) as hits on items.rowid = hits.rowid;`)
-    .all(JSON.stringify(query), k)
+    ) as hits on items.rowid = hits.rowid and hits.distance <= ?;`)
+    .all(JSON.stringify(query), k, threshold)
 
-  ok('db/topic', topic, items.length, 'items')
+  ok('db/topic', topic, '-', items.length, 'items')
 
   return items.map(xformItemRowToItem)
 }
