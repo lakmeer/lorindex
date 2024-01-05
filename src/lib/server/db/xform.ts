@@ -5,7 +5,7 @@
 
 // Database row to Item
 
-export function xformItemRowToItem (row:ItemRow):Item {
+export function xformItemRowToItem (row:QueryResult):Item {
   return {
     id:       row.id,
     time:     row.last_update,

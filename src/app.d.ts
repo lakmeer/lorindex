@@ -55,6 +55,10 @@ declare type ItemRow = {
   data: Buffer
 }
 
+declare type QueryResult = ItemRow & {
+  distance?: number
+}
+
 
 // Other
 

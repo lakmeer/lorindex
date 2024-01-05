@@ -4,9 +4,10 @@
   import { log, info } from '$lib/log.client'
   import { getJson } from '$lib/utils'
 
-  import Topic    from '$comp/Topic.svelte';
-  import TextItem from '$comp/TextItem.svelte';
+  import Topic       from '$comp/Topic.svelte';
+  import TextItem    from '$comp/TextItem.svelte';
   import NewTextItem from '$comp/NewTextItem.svelte';
+  import VSSControls from '$comp/VSSControls.svelte';
 
 
   export let data
@@ -28,8 +29,17 @@
   onMount(() => {
     getItems(topic)
   })
+
+
+  // Search paramters
+
+  let topK      = 10
+  let threshold = 0.5
+
 </script>
 
+
+<VSSControls bind:topK bind:threshold />
 
 <main class="px-8 py-16 text-lg max-w-prose mx-auto">
   <Topic class="mb-10" topic={topic} on:change={({ detail }) => getItems(detail) } />
