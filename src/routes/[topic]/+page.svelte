@@ -9,7 +9,7 @@
   import NewTextItem from '$comp/NewTextItem.svelte';
 
 
-  export let data;
+  export let data
 
 
   // Topic changes

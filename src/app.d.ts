@@ -2,9 +2,13 @@
 // SvelteKit App
 
 declare namespace App {
-	// interface Error {}
-	// interface Locals {}
+	interface Locals {
+    db: Database
+    topic: string
+  }
+
 	// interface PageData {}
+	// interface Error {}
 	// interface Platform {}
 }
 

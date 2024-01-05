@@ -33,15 +33,10 @@ export function getJson<T> (url:string, data:object):Promise<T> {
 
 
 export function postJson<T> (url:string, data:object):Promise<PostResult<T>> {
-  const params = new URLSearchParams()
-
-  for (const key in data) {
-    params.append(key, data[key])
-  }
-
-  return fetch(url + '?' + params.toString(), {
-    method: 'GET',
+  return fetch(url, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   })
   .then(response => response.json())
   .then(result => {

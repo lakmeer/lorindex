@@ -1,7 +1,7 @@
 <script lang="ts">
 
   import { postJson } from '$lib/utils'
-  import { error } from '$lib/log.client'
+  import { error, ok } from '$lib/log.client'
 
   export let id:      Item['id']
   export let hash:    Item['hash']
@@ -15,16 +15,13 @@
 
     status = 'pending'
 
-    const result = await postJson('/api/update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, hash, desc, content })
-    })
+    const result = await postJson('/api/update', { id, hash, desc, content })
 
     if (result.error) {
       error('TextItem/submit', result.message)
       status = 'modified'
     } else {
+      ok('TextItem/submit', 'saved')
       status = 'done'
     }
 	}
@@ -43,7 +40,6 @@
     on:input={() => status = 'modified'}
     on:blur={submit}
     contenteditable
-    disabled={status !== 'pending'}
     bind:textContent={content}>
   </div>
 </div>

@@ -20,7 +20,7 @@ export const POST: RequestHandler = async ({ request }) => {
     content: data.content
   })
 
-  ok('api/update', `${data.hash} ->  ${item.hash}`)
+  ok('api/update', `${data.hash} -> ${item.hash}`)
 
   return new Response(JSON.stringify(item), {
     headers: {

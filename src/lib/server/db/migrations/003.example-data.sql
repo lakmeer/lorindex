@@ -34,6 +34,15 @@ insert into items (type, hash, desc, content, embedding, data) values
     null, null),
 
   ( 'text', 'efccf50cc37900003107da8e5776925d',
-    'Thre relationship between raspberries and music is not immediately apparent',
+    'The relationship between raspberries and music is not immediately apparent',
     'The intersection of raspberries and music, while not immediately apparent, emerges in the realm of cultural and artistic expression. Raspberries, with their vibrant color and distinct flavor, have inspired various musical works and titles, symbolizing themes of sweetness, transience, and nature''s bounty. Musicians and songwriters often draw on such sensory experiences to evoke emotions or create imagery in their compositions. In a more literal sense, the cultivation of raspberries, often a backdrop in rural and pastoral landscapes, has been the setting for folk songs and country music that celebrate agricultural life and the rhythms of nature. This connection, albeit subtle, illustrates how the sensory pleasures of something as simple as a fruit can intertwine with the emotive power of music, enriching human experiences across different sensory and cultural dimensions.',
-    null, null);
+    null, null),
+
+  ( 'text', '537c9d8000918b59ae075ef603a3e943',
+    'Description of Black Panthers',
+    'A black panther is the melanistic colour variant of the leopard (Panthera pardus) and the jaguar (Panthera onca). Black panthers of both species have excess black pigments, but their typical rosettes are also present. They have been documented mostly in tropical forests, with black leopards in Africa and Asia, and black jaguars in South America. Melanism is caused by a recessive allele in the leopard, and by a dominant allele in the jaguar.',
+    null, null)
+;
+
+
+
