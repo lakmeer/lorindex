@@ -28,8 +28,11 @@
     </div>
 
     <div class="text-sm my-3"> <strong>{desc}</strong> </div>
-    <div class="text-xs"> <strong>Updated At:</strong> {time} </div>
-    <div class="text-xs"> <strong>Distance:</strong> {distance.toFixed(3)} </div>
+
+    {#if time}
+      <div class="text-xs"> <strong>Updated At:</strong> {time} </div>
+      <div class="text-xs"> <strong>Distance:</strong> {distance.toFixed(3)} </div>
+    {/if}
   </div>
 
   <slot />

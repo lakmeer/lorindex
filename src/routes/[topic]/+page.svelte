@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { fly } from 'svelte/transition'
   import { ok, warn, log } from '$lib/log.client'
-  import { getJson, slugify, unslugify } from '$lib/utils'
+  import { getJson, slugify } from '$lib/utils'
 
   import Topic       from '$comp/Topic.svelte'
   import TextItem    from '$comp/TextItem.svelte'
@@ -11,6 +11,9 @@
 
 
   export let data
+
+  let limit     = data.settings.limit
+  let threshold = data.settings.threshold
 
 
   // Topic changes
@@ -34,10 +37,7 @@
   })
 
 
-  // Search paramters
-
-  let limit     = data.settings.limit
-  let threshold = data.settings.threshold
+  // History management
 
   function pop (event:PopStateEvent) {
     log('Main/pop', event.state.topic)
@@ -48,6 +48,15 @@
       warn('Main/pop', 'no topic in state')
     }
   }
+
+
+  // New Items
+
+  function pushNewItem (item:Item) {
+    log('pushNewItem', item)
+    items = items.concat(item)
+  }
+
 </script>
 
 
@@ -65,7 +74,7 @@
 
     <div class="space-y-6 mb-6">
       {#each items as item, ix}
-        {#key item.id}
+        {#key item.hash}
           <div in:fly={{ y: 20, duration: 200, delay: ix * 100 }}>
             <TextItem {...item} />
           </div>
@@ -73,7 +82,7 @@
       {/each}
     </div>
 
-    <NewTextItem on:submit={({ detail }) => items.push(detail)} />
+    <NewTextItem topic={topic} on:created={({ detail }) => pushNewItem(detail)} />
   </article>
 </main>
 

@@ -5,7 +5,7 @@ import MD5 from 'crypto-js/md5'
 
 import { migrate }            from '$lib/server/db/migrations'
 import { embed }              from '$lib/openai'
-import { warn, ok, info, log }from '$lib/log'
+import { warn, ok, info, log, error }from '$lib/log'
 import { xformItemRowToItem } from '$lib/server/db/xform'
 
 import { DEFAULT_LIMIT, DEFAULT_THRESHOLD } from '$lib/const'
@@ -55,25 +55,28 @@ export async function topicItems (topic:string, k = DEFAULT_LIMIT, threshold = D
 
 // New Text Item
 
-export async function newTextItem (desc:string, content:string, tags:string[] = []) {
+export async function createTextItem (content:string, tags:string[] = []) {
   const hash      = MD5(content).toString()
+  const desc      = 'TODO: Auto-description'
   const embedding = await embed(desc + ' ' + content)
 
   // 🔴 Tags
 
-  db.prepare(`
+  const { lastInsertRowid } = db.prepare(`
     insert into items (type, hash, desc, content) values (?, ?, ?, ?)`)
     .run('text', hash, desc, content)
 
   db.prepare(`
     insert into vss_items (rowid, embedding) values (?, ?)`)
-    .run(db.lastInsertRowid, JSON.stringify(embedding))
+    .run(lastInsertRowid, JSON.stringify(embedding))
 
-  const newItem = db.prepare(`
+  const item = db.prepare(`
     select * from items where id = ?`)
-    .get(db.lastInsertRowid)
+    .get(lastInsertRowid)
 
-  return xformItemRowToItem(newItem)
+  ok('db/create', `created #${item.id}:${item.hash}`)
+
+  return xformItemRowToItem(item)
 }
 
 
@@ -154,6 +157,22 @@ export function rehash () {
   }
 
   ok('db/rehash', 'done')
+}
+
+// Get a single distance for a given item and topic
+
+export async function distance (item:Item, topic:string):Promise<number> {
+  const query = await embed(topic)
+
+  const result = db.prepare(`
+    select rowid, distance from vss_items
+    where vss_search(embedding, ?) and rowid = ?
+    limit 1`)
+    .get(JSON.stringify(query), item.id)
+
+  if (!result) error('db/distance', `no result for #${item.id}:${item.hash} from '${topic}'`)
+
+  return result?.distance ?? 1
 }
 
 
