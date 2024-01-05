@@ -14,7 +14,7 @@ import { OPENAI_API_KEY } from '$env/static/private'
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY })
 
 
-// Functions
+// Embed new text
 
 export async function embed (text:string):Vector {
   const hash = MD5(text).toString()
@@ -43,3 +43,28 @@ export async function embed (text:string):Vector {
   return embedding.data[0].embedding
 }
 
+
+// Generate description of text
+
+export async function describe (text:string):string {
+  const hash = MD5(text).toString()
+
+  const time = performance.now()
+
+  ai('openai/describe', `describing ${hash}...`)
+
+  const description = await openai.completions.create({
+    engine: 'davinci-text-003',
+    prompt: `This is a description of a text snippet.\n\nText: ${text}\n\nDescription:`,
+    temperature: 0.1,
+    max_tokens: 64,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    stop: ['\n'],
+  })
+
+  ai('openai/describe', `done in ${Math.floor(performance.now() - time)/1000} seconds`)
+
+  return description.data.choices[0].text.trim()
+}

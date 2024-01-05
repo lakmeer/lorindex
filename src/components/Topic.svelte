@@ -23,12 +23,17 @@
 </script>
 
 
+<svelte:head>
+  <title>{ internal } ~ Lorindex</title>
+</svelte:head>
+
 <h1 class="flex {$$restProps.class}">
   <input class="text-3xl flex-1"
     name="topic"
     type="text"
     bind:value={internal}
     on:blur={setTopic}
+    placeholder="Type anything"
     on:keyup={debounce(800, setTopic)}
   />
 </h1>
