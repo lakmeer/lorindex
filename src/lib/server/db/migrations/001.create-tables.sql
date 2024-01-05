@@ -3,12 +3,11 @@
 
 create table if not exists items (
   id integer primary key autoincrement,
-  last_update timestamp default current_timestamp,
+  last_update timestamp default (unixepoch('now')),
   hash text not null,
   type text not null check(type in ('text', 'image', 'audio', 'link')),
   desc text,
   content text,
-  embedding text,
   data blob
 );
 
@@ -38,3 +37,11 @@ create virtual table if not exists vss_items using vss0(
   embedding(1536)
 );
 
+
+-- Query embedding cache
+
+create table if not exists embedding_cache (
+  id integer primary key,
+  hash text not null unique,
+  embedding text not null
+);

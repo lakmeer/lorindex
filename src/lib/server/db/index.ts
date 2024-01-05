@@ -10,7 +10,9 @@ import { xformItemRowToItem } from '$lib/server/db/xform'
 
 import { DEFAULT_LIMIT, DEFAULT_THRESHOLD } from '$lib/const'
 
-const DB_PATH = ':memory:' // './src/lib/server/db/main.db'
+const PROTECT_DB = false
+
+const DB_PATH ='./src/lib/server/db/test.db'
 
 
 //
@@ -47,6 +49,7 @@ export async function topicItems (topic:string, k = DEFAULT_LIMIT, threshold = D
 
   return items.map(xformItemRowToItem)
 }
+
 
 
 //
@@ -112,6 +115,7 @@ export async function updateTextItem (id:number, data:Partial<Item>):Promise<Ite
 }
 
 
+
 //
 // Utils
 //
@@ -159,6 +163,7 @@ export function rehash () {
   ok('db/rehash', 'done')
 }
 
+
 // Get a single distance for a given item and topic
 
 export async function distance (item:Item, topic:string):Promise<number> {
@@ -176,13 +181,53 @@ export async function distance (item:Item, topic:string):Promise<number> {
 }
 
 
-// Export instance
+// Cache embedding results
 
-const db = new Database(DB_PATH)
+export function getCachedEmbedding (hash:string):Vector|null {
+  const embedding = db.prepare(`
+    select embedding from embedding_cache where hash = ?`)
+    .pluck()
+    .get(hash)
+
+  if (embedding) return JSON.parse(embedding) as Vector
+
+  return null
+}
+
+export function saveCachedEmbedding (hash:string, embedding:Vector) {
+  let result =  db.prepare(`
+    insert or ignore into embedding_cache (hash, embedding) values (?, ?)`)
+    .run(hash, JSON.stringify(embedding))
+
+  if (result.changes === 0) warn('db/cache/save', 'attempted to cache existing embedding', hash)
+}
+
+
+
+//
+// Export instance
+//
+
+info('db/init', 'loading database', DB_PATH)
+
+let db = new Database(DB_PATH)
 db.pragma('journal_mode = WAL')
 VSS.load(db)
+
+if (PROTECT_DB) {
+  info('db/init', 'copying test database to memory')
+  const buffer = db.serialize()
+  db.close()
+  // 🔴 Currently doesnt work
+  db = new Database(buffer)
+  db.pragma('journal_mode = WAL')
+  VSS.load(db)
+}
+
+ok('db/init', 'done')
+
 migrate(db)
-refill()
+await refill()
 
 export default db
 

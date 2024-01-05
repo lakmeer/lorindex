@@ -4,6 +4,8 @@ import MD5 from "crypto-js/md5"
 import fs from 'fs'
 import { ai } from '$lib/log'
 
+import { getCachedEmbedding, saveCachedEmbedding } from '$lib/server/db'
+
 import { OPENAI_API_KEY } from '$env/static/private'
 
 
@@ -34,22 +36,24 @@ function addMemo (hash:string, embedding:Vector) {
 export async function embed (text:string):Vector {
   const hash = MD5(text).toString()
 
-  if (memo[hash]) {
+  let embedding = getCachedEmbedding(hash)
+
+  if (embedding) {
     ai('openai/embed', `${hash} is cached`)
-    return memo[hash]
+    return embedding
   }
 
   const time = performance.now()
 
   ai('openai/embed', `embedding ${hash}...`)
 
-  const embedding = await openai.embeddings.create({
+  embedding = await openai.embeddings.create({
     model: 'text-embedding-ada-002',
     input: text,
     encoding_format: 'float',
   })
 
-  addMemo(hash, embedding.data[0].embedding)
+  saveCachedEmbedding(hash, embedding.data[0].embedding)
 
   ai('openai/embed', `done in ${Math.floor(performance.now() - time)/1000} seconds`)
 
