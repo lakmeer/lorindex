@@ -1,24 +1,16 @@
 <script lang="ts">
+  import Item from '$comp/Item.svelte'
 
-  let content = '';
-  let status:Status = 'done';
-
+  let content = ''
+  let status:Status = 'nothing'
 </script>
 
 
-<div class="relative mt-6">
-  <button class="absolute right-full top-0 w-4 h-4 mr-2 !mt-1 rounded-full transition-colors"
-    class:bg-gray-500={content === ''}
-    class:bg-red-500={status === 'modified'}
-    class:bg-yellow-500={status === 'pending'}
-    class:bg-emerald-500={status === 'done'}
-    on:click>
-  </button>
-
+<Item type='text' hash="00000000000000000000000" desc="New Item" time={0} distance={1} {status}>
   <div
-    class="block w-full min-h-[3rem]"
+    class="border border-slate-400 block w-full min-h-[3rem]"
     contenteditable
     bind:textContent={content}>
   </div>
-</div>
+</Item>
 

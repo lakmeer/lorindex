@@ -15,8 +15,8 @@ function logger (color:string, fore = color) {
   return function (first:string, ...args: any[]) {
     console.log(
       `%c${SIGIL}%c ${first}`,
-      `background-color: ${color}; color: black;`,
-      `color: ${fore};`, 
+      `background-color:${color}; color:black`,
+      `color: ${fore}`, 
       ...args
     )
   }

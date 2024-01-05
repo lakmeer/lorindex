@@ -1,6 +1,6 @@
 
 import OpenAI from 'openai'
-import MD5 from "crypto-js/md5";
+import MD5 from "crypto-js/md5"
 import fs from 'fs'
 import { ai } from '$lib/log'
 
@@ -47,7 +47,7 @@ export async function embed (text:string):Vector {
     model: 'text-embedding-ada-002',
     input: text,
     encoding_format: 'float',
-  });
+  })
 
   addMemo(hash, embedding.data[0].embedding)
 

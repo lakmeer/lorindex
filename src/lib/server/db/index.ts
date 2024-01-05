@@ -1,5 +1,5 @@
 
-import Database from 'better-sqlite3';
+import Database from 'better-sqlite3'
 import * as VSS from 'sqlite-vss'
 import MD5 from 'crypto-js/md5'
 
@@ -7,6 +7,8 @@ import { migrate }            from '$lib/server/db/migrations'
 import { embed }              from '$lib/openai'
 import { warn, ok, info, log }from '$lib/log'
 import { xformItemRowToItem } from '$lib/server/db/xform'
+
+import { DEFAULT_LIMIT, DEFAULT_THRESHOLD } from '$lib/const'
 
 const DB_PATH = ':memory:' // './src/lib/server/db/main.db'
 
@@ -27,7 +29,7 @@ export function allItems (limit:number = DEFAULT_LIMIT):Item[] {
 
 // Get items with correlated topic
 
-export async function topicItems (topic:string, k = DEFAULT_LIMIT, threshold = 0.5):Promise<Item[]> {
+export async function topicItems (topic:string, k = DEFAULT_LIMIT, threshold = DEFAULT_THRESHOLD):Promise<Item[]> {
   info('db/topic', `query ${topic}, (limit ${k}, thresh ${threshold})`)
 
   const query = await embed(topic)
@@ -70,7 +72,7 @@ export async function newTextItem (desc:string, content:string, tags:string[] = 
   const newItem = db.prepare(`
     select * from items where id = ?`)
     .get(db.lastInsertRowid)
-    
+
   return xformItemRowToItem(newItem)
 }
 

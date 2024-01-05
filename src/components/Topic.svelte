@@ -1,21 +1,29 @@
 <script lang="ts">
 
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from 'svelte'
   import { debounce } from '$lib/utils'
+  import { info, warn, ok } from '$lib/log.client'
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher()
 
   export let topic:string
 
   let internal:string = topic
 
   function setTopic () {
-    topic = internal
-    dispatch('change', topic);
-  }
+    if (internal === '') return warn('Topic/setTopic', 'is empty')
+    if (history.state?.topic == topic) return warn('Topic/setTopic', 'no change')
 
-  function updateUrl (_:KeyboardEvent) {
-    history.replaceState(null, '', '/' + encodeURIComponent(internal))
+    topic = internal
+
+    info('Topic/setTopic', topic)
+
+    dispatch('change', topic)
+
+    history.pushState({ topic }, '', '/' + encodeURIComponent(topic))
+
+    ok('Topic/setTopic', topic, history.state)
+
   }
 </script>
 
@@ -26,7 +34,6 @@
     type="text"
     bind:value={internal}
     on:blur={setTopic}
-    on:keyup={updateUrl}
-    on:keyup={debounce(500, setTopic)}
+    on:keyup={debounce(800, setTopic)}
   />
 </h1>

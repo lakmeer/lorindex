@@ -1,5 +1,5 @@
 
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from './$types'
 
 import { info, ok } from '$lib/log'
 import { updateTextItem } from '$lib/server/db'

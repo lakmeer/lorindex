@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import { postJson } from '$lib/utils';
+  import { createEventDispatcher } from 'svelte'
+  import { postJson } from '$lib/utils'
 
   export let limit:number
   export let threshold:number

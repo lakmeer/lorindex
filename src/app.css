@@ -4,6 +4,6 @@
 
 @layer utilities {
   .debug, .debug * {
-    box-shadow: 0 0 0 1px theme('colors.slate.500') inset;
+    box-shadow: 0 0 0 1px theme('colors.purple.500') inset;
   }
 }

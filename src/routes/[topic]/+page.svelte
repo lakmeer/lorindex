@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { fly } from 'svelte/transition';
-  import { ok, info } from '$lib/log.client'
+  import { onMount } from 'svelte'
+  import { fly } from 'svelte/transition'
+  import { ok, log } from '$lib/log.client'
   import { getJson } from '$lib/utils'
 
-  import Topic       from '$comp/Topic.svelte';
-  import TextItem    from '$comp/TextItem.svelte';
-  import NewTextItem from '$comp/NewTextItem.svelte';
-  import VSSControls from '$comp/VSSControls.svelte';
+  import Topic       from '$comp/Topic.svelte'
+  import TextItem    from '$comp/TextItem.svelte'
+  import NewTextItem from '$comp/NewTextItem.svelte'
+  import VSSControls from '$comp/VSSControls.svelte'
 
 
   export let data
@@ -23,10 +23,11 @@
   async function getItems (newTopic:string) {
     topic = newTopic
     status = 'pending'
-    info('topic/getItems', topic, limit, threshold)
+    log('Main/getItems', topic, limit, threshold)
+
     items = await getJson('/api/topic/', { topic, limit, threshold })
     status = 'done'
-    ok('topic/getItems', topic, items.length)
+    ok('Main/getItems', `${items.length} results for '${topic}'`)
   }
 
   onMount(() => {
@@ -39,8 +40,13 @@
   let limit     = data.settings.limit
   let threshold = data.settings.threshold
 
+  function pop (event) {
+    log('pop', event)
+  }
 </script>
 
+
+<svelte:window on:popstate={pop} />
 
 <main class="mx-auto flex min-h-screen">
   <aside class="px-8 bg-slate-200 border-r border-slate-500 min-w-aside min-h-full">
@@ -49,8 +55,8 @@
     </div>
   </aside>
 
-  <article class="max-w-prose px-8 xl:px-16 py-16 xl:text-lg">
-    <div class="mb-10" class:opacity-50={status==='pending'}>
+  <article class="max-w-prose w-full px-8 xl:px-16 py-16 xl:text-lg">
+    <div class="mb-10 transition-opacity" class:opacity-50={status==='pending'}>
       <Topic topic={topic} on:change={({ detail }) => getItems(detail) } />
     </div>
 
@@ -61,10 +67,6 @@
             <TextItem {...item} />
           </div>
         {/key}
-      {:else}
-        <div in:fly={{ y: 20, duration: 200, delay: ix * 100 }}>
-          <h3 class="text-center text-xl"> No Results </h3>
-        </div>
       {/each}
     </div>
 

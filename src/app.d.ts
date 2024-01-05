@@ -68,7 +68,7 @@ declare type QueryResult = ItemRow & {
 
 // Other
 
-declare type Status = 'modified' | 'pending' | 'done'
+declare type Status = 'modified' | 'pending' | 'done' | 'nothing'
 
 declare type PostResult<T> = { error: true, message: string } | { error: false, data: T }
 

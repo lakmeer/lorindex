@@ -1,5 +1,5 @@
 
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from './$types'
 import { log } from '$lib/log'
 import { KEY_SETTINGS } from '$lib/const'
 
