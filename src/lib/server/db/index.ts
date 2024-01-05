@@ -2,6 +2,7 @@
 import Database from 'better-sqlite3'
 import * as VSS from 'sqlite-vss'
 import MD5 from 'crypto-js/md5'
+import fs from 'fs'
 
 import { migrate }            from '$lib/server/db/migrations'
 import { embed }              from '$lib/openai'
@@ -10,7 +11,7 @@ import { xformItemRowToItem } from '$lib/server/db/xform'
 
 import { DEFAULT_LIMIT, DEFAULT_THRESHOLD } from '$lib/const'
 
-const PROTECT_DB = false
+const PROTECT_DB = true
 
 const DB_PATH ='./src/lib/server/db/test.db'
 
@@ -210,19 +211,28 @@ export function saveCachedEmbedding (hash:string, embedding:Vector) {
 
 info('db/init', 'loading database', DB_PATH)
 
+// 🟢 Hax method
+if (PROTECT_DB) {
+  warn('db/init', 'restoring test database from backup')
+  info('db/init', 'backup file size:', fs.statSync(DB_PATH + '.backup').size)
+  info('db/init', 'master file size:', fs.statSync(DB_PATH).size)
+  fs.copyFileSync(DB_PATH + '.backup', DB_PATH)
+}
+
 let db = new Database(DB_PATH)
 db.pragma('journal_mode = WAL')
 VSS.load(db)
 
+/* 🔴 Currently doesnt work
 if (PROTECT_DB) {
   info('db/init', 'copying test database to memory')
   const buffer = db.serialize()
   db.close()
-  // 🔴 Currently doesnt work
   db = new Database(buffer)
   db.pragma('journal_mode = WAL')
   VSS.load(db)
 }
+*/
 
 ok('db/init', 'done')
 
