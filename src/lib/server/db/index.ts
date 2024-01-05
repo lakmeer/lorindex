@@ -10,10 +10,11 @@ import { warn, ok, info, log, error }from '$lib/log'
 import { xformItemRowToItem } from '$lib/server/db/xform'
 
 import { DEFAULT_LIMIT, DEFAULT_THRESHOLD } from '$lib/const'
+import { DB_NAME } from '$env/static/private'
 
-const PROTECT_DB = true
+const PROTECT_DB = false
 
-const DB_PATH ='./src/lib/server/db/test.db'
+const DB_PATH = `./src/lib/server/db/data/${DB_NAME}.db`
 
 
 //
@@ -61,7 +62,7 @@ export async function topicItems (topic:string, k = DEFAULT_LIMIT, threshold = D
 
 export async function createTextItem (content:string, tags:string[] = []) {
   const hash      = MD5(content).toString()
-  const desc      = 'TODO: Auto-description'
+  const desc      = null
   const embedding = await embed(desc + ' ' + content)
 
   // 🔴 Tags
@@ -143,6 +144,22 @@ export async function refill () {
 }
 
 
+// Check for missing description and fill them in
+
+export function describe () {
+  const items = db.prepare(`
+    select * from items where desc = null`)
+    .all()
+
+  if (items.length === 0) return ok(`db/describe: all ok`)
+
+  warn('db/describe', `${items.length} items are missing embeddings`)
+  error('db/describe', 'not implemented')
+
+  //ok('db/describe', 'done')
+}
+
+
 // Recompute content hashes
 
 export function rehash () {
@@ -211,14 +228,22 @@ export function saveCachedEmbedding (hash:string, embedding:Vector) {
 // Export instance
 //
 
-info('db/init', 'loading database', DB_PATH)
+if (!fs.existsSync(DB_PATH)) {
+  warn('db/init', `database '${DB_NAME}' not found at ${DB_PATH}`)
+  warn('db/init', 'a new one will be created')
+}
+
+info('db/init', `loading database '${DB_NAME}'`)
 
 // 🟢 Hax method
 if (PROTECT_DB) {
-  warn('db/init', 'restoring test database from backup')
-  info('db/init', 'backup file size:', fs.statSync(DB_PATH + '.backup').size)
-  info('db/init', 'master file size:', fs.statSync(DB_PATH).size)
-  fs.copyFileSync(DB_PATH + '.backup', DB_PATH)
+  if (fs.fileExistsSync(DB_PATH + '.backup')) {
+    warn('db/init', 'restoring test database from backup')
+    fs.copyFileSync(DB_PATH + '.backup', DB_PATH)
+  } else {
+    warn('db/init', 'creating test database backup')
+    fs.copyFileSync(DB_PATH, DB_PATH + '.backup')
+  }
 }
 
 let db = new Database(DB_PATH)
@@ -240,6 +265,7 @@ ok('db/init', 'done')
 
 migrate(db)
 await refill()
+
 
 export default db
 

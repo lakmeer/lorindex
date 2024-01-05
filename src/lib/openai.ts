@@ -15,22 +15,6 @@ import { OPENAI_API_KEY } from '$env/static/private'
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY })
 
 
-// Memo cache
-
-const MEMO_FILE = './src/lib/server/db/memo.json'
-
-if (!fs.existsSync(MEMO_FILE)) {
-  fs.writeFileSync(MEMO_FILE, '{}')
-}
-
-const memo:Record<string,Vector> = JSON.parse(fs.readFileSync(MEMO_FILE, 'utf8'))
-
-function addMemo (hash:string, embedding:Vector) {
-  memo[hash] = embedding
-  fs.writeFileSync(MEMO_FILE, JSON.stringify(memo))
-}
-
-
 // Functions
 
 export async function embed (text:string):Vector {
