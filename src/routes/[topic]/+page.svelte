@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { fly } from 'svelte/transition'
   import { ok, warn, log } from '$lib/log.client'
-  import { getJson } from '$lib/utils'
+  import { getJson, slugify, unslugify } from '$lib/utils'
 
   import Topic       from '$comp/Topic.svelte'
   import TextItem    from '$comp/TextItem.svelte'
@@ -30,6 +30,7 @@
 
   onMount(() => {
     getItems(topic)
+    history.replaceState({ topic }, '', '/' + slugify(topic))
   })
 
 
