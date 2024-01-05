@@ -2,11 +2,16 @@
 import OpenAI from 'openai'
 import MD5 from "crypto-js/md5"
 import fs from 'fs'
-import { ai, log } from '$lib/log'
+import { ai, log, info } from '$lib/log'
+import { fillPrompt } from '$lib/utils'
 
 import { getCachedEmbedding, saveCachedEmbedding } from '$lib/server/db'
 
 import { OPENAI_API_KEY } from '$env/static/private'
+
+import SUMMARY_PROMPT from '$lib/openai/prompts/summary?raw'
+
+const MIN_TEXT_LENGTH = 20
 
 
 // Global State
@@ -44,27 +49,34 @@ export async function embed (text:string):Vector {
 }
 
 
-// Generate description of text
+// Summarise a text snippet
 
-export async function describe (text:string):string {
+export async function summary (text:string):string {
+
+  if (text.length < MIN_TEXT_LENGTH) {
+    warn('openai/summary', `text too short: ${text}`)
+    return ""
+  }
+
   const hash = MD5(text).toString()
-
   const time = performance.now()
 
-  ai('openai/describe', `describing ${hash}...`)
-
-  const description = await openai.completions.create({
-    engine: 'davinci-text-003',
-    prompt: `This is a description of a text snippet.\n\nText: ${text}\n\nDescription:`,
+  const completion = await openai.completions.create({
+    model: 'gpt-3.5-turbo-instruct',
+    prompt: fillPrompt(SUMMARY_PROMPT, { text }),
     temperature: 0.1,
     max_tokens: 64,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-    stop: ['\n'],
+    stop: ['\n', '.'],
   })
 
-  ai('openai/describe', `done in ${Math.floor(performance.now() - time)/1000} seconds`)
+  // 🔴 Look for failure cases like 'Unknown topic'
 
-  return description.data.choices[0].text.trim()
+  const summary   = completion.choices[0].text.trim()
+  const totalTime = Math.floor(performance.now() - time)/1000
+  const tokens    = completion.usage.prompt_tokens + '+' + completion.usage.completion_tokens
+
+  ai('openai/summary', `#${hash.slice(0,8)} -> "${summary}" in ${totalTime}s, ${tokens}tk`)
+
+  return summary
 }
+

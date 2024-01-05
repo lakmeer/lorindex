@@ -2,7 +2,7 @@
 
   import { createEventDispatcher } from 'svelte';
   import { postJson } from '$lib/utils'
-  import { error, ok } from '$lib/log.client'
+  import { error, ok, log } from '$lib/log.client'
 
   import Item from '$comp/Item.svelte'
 
@@ -14,7 +14,8 @@
   let status:Status = 'nothing'
 
   async function submit () {
-    if (status !== 'modified') return console.warn("Not modified")
+    if (status !== 'modified') return log('NewTextItem/submit', "Not modified")
+    if (content.trim().length < 1) return log('NewTextItem/submit', "Empty")
 
     status = 'pending'
 

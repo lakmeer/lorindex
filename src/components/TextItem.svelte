@@ -1,6 +1,6 @@
 <script lang="ts">
   import { postJson } from '$lib/utils'
-  import { error, ok } from '$lib/log.client'
+  import { error, ok, log } from '$lib/log.client'
 
   import Item from '$comp/Item.svelte'
 
@@ -16,7 +16,11 @@
   let status : Status = 'done'
 
   async function submit () {
-    if (status !== 'modified') return console.warn("Not modified")
+    if (status !== 'modified') return log('TextItem/submit', "Not modified")
+    if (content.trim().length < 1) {
+      status = 'done'
+      return log('TextItem/submit', "Empty")
+    }
 
     status = 'pending'
 

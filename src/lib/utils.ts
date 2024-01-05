@@ -60,3 +60,10 @@ export function unslugify (text:string):string {
   return text.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
 }
 
+
+export function fillPrompt (prompt:string, data:object):string {
+  return prompt
+    .replace('[[stop]]', '')
+    .replace(/{{(.*?)}}/g, (_, key) => data[key.trim()])
+}
+

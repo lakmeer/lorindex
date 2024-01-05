@@ -5,9 +5,10 @@ import MD5 from 'crypto-js/md5'
 import fs from 'fs'
 
 import { migrate }            from '$lib/server/db/migrations'
-import { embed }              from '$lib/openai'
-import { warn, ok, info, log, error }from '$lib/log'
+import { embed, summary }     from '$lib/openai'
 import { xformItemRowToItem } from '$lib/server/db/xform'
+
+import { warn, ok, info, log, error }from '$lib/log'
 
 import { DEFAULT_LIMIT, DEFAULT_THRESHOLD } from '$lib/const'
 import { DB_NAME } from '$env/static/private'
@@ -62,7 +63,7 @@ export async function topicItems (topic:string, k = DEFAULT_LIMIT, threshold = D
 
 export async function createTextItem (content:string, tags:string[] = []) {
   const hash      = MD5(content).toString()
-  const desc      = null
+  const desc      = await summary(content)
   const embedding = await embed(desc + ' ' + content)
 
   // 🔴 Tags
@@ -89,6 +90,8 @@ export async function createTextItem (content:string, tags:string[] = []) {
 
 export async function updateTextItem (id:number, data:Partial<Item>):Promise<Item> {
   info('db/update: updating item', id)
+
+  // 🔴 Work out whether desc needs to be recalculated
 
   const hash = MD5(data.content).toString()
   const embedding = await embed(data.desc + ' ' + data.content)
@@ -172,23 +175,31 @@ export async function clean () {
       .run(id)
   }
 
-  ok('db/refill', 'done')
+  ok('db/clean', 'done')
 }
 
 
 // Check for missing description and fill them in
 
-export function describe () {
+export async function describe () {
   const items = db.prepare(`
-    select * from items where desc = null`)
+    select * from items where desc is null`)
     .all()
 
-  if (items.length === 0) return ok(`db/describe: all ok`)
+  if (items.length === 0) return log('db/describe', '✔')
 
-  warn('db/describe', `${items.length} items are missing embeddings`)
-  error('db/describe', 'not implemented')
+  warn('db/describe', `${items.length} items are missing descriptions`)
 
-  //ok('db/describe', 'done')
+  for (const item of items) {
+    log('db/describe', item)
+    const desc = await summary(item.content)
+
+    db.prepare(`
+      update items set desc = ? where id = ?`)
+      .run(desc, item.id)
+  }
+
+  ok('db/describe', 'done')
 }
 
 
@@ -268,7 +279,7 @@ info('db/init', `loading database '${DB_NAME}'`)
 
 // 🟢 Hax method
 if (PROTECT_DB) {
-  if (fs.fileExistsSync(DB_PATH + '.backup')) {
+  if (fs.existsSync(DB_PATH + '.backup')) {
     warn('db/init', 'restoring test database from backup')
     fs.copyFileSync(DB_PATH + '.backup', DB_PATH)
   } else {
@@ -292,12 +303,15 @@ if (PROTECT_DB) {
 }
 */
 
-ok('db/init', 'loaded', total(), 'items')
+info('db/init', 'loaded', total(), 'items')
 
+// Housework
 migrate(db)
 clean()
 await refill()
+await describe()
 
+ok('db/init', 'done')
 
 export default db
 

@@ -17,3 +17,8 @@
   🔴 Makes working DBs portable and compact, runs on any client
 🟢 Port longbridge data
 🔴 Add image items
+🔴 Delete items
+🔴 Track token usage stats
+🔴 Cache summaries
+🔴 Collect constants into one file
+  🔴 Make configurable
