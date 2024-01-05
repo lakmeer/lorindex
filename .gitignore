@@ -11,3 +11,4 @@ vite.config.ts.timestamp-*
 src/lib/server/db/*.db
 .vite
 src/lib/server/db/*.db-*
+src/lib/server/db/memo.json
