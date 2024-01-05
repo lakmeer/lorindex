@@ -8,7 +8,7 @@ export function log (...args: any[]) {
 }
 
 export function debug (...args: any[]) {
-  console.log(Colors.brightWhite.inverse(SIGIL), ...args)
+  console.log(Colors.white.inverse(SIGIL), ...args)
 }
 
 export function info (...args: any[]) {

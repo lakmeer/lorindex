@@ -1,27 +1,20 @@
 
 import type { Database } from 'better-sqlite3'
-import { log, info, warn, error, ok } from '$lib/log'
+import { log, info, warn, ok } from '$lib/log'
 import fs from 'fs'
+
+type Db = typeof Database
 
 const DB_MIGRATIONS_PATH = './src/lib/server/db/migrations'
 
 
-// Types
-
-export type Migration = {
-  version: number
-  name: string
-  query: string
-}
-
-
 // Functions
 
-export function getUserVersion (db:Database) {
+export function getUserVersion (db:Db) {
   return db.prepare(`pragma user_version`).get().user_version
 }
 
-export function setUserVersion (db:Database, version:number) {
+export function setUserVersion (db:Db, version:number) {
   return db.exec(`pragma user_version = ${version}`)
 }
 
@@ -29,19 +22,18 @@ export function getMigrations () {
   return migrations
 }
 
-export function runMigrations (db:Database) {
+export function migrate (db:Db) {
 
   const version = getUserVersion(db)
-  const lastMigration = migrations[migrations.length - 1].version
 
   let work = false
 
-  log('runMigrations: current version is', version)
+  log('db/migrate: current version is', version)
 
   for (let migration of migrations) {
     if (migration.version > version) {
       work = true
-      info('runMigrations: running migration', migration.version, migration.name)
+      info('db/migrate: running migration', migration.version, migration.name)
       db.exec(migration.query)
       setUserVersion(db, migration.version)
     }
@@ -49,12 +41,12 @@ export function runMigrations (db:Database) {
 
   if (work) {
     db.exec(`vacuum`)
-    ok('runMigrations: done. new version is', getUserVersion(db))
+    ok('db/migrate: done. new version is', getUserVersion(db))
   }
 }
 
-export function refresh (db:Database) {
-  info('refresh: starting...')
+export function refresh (db:Db) {
+  info('db/refresh: starting...')
 
   const tables = db.prepare("select name from sqlite_master where type is 'table'").pluck().all()
 
@@ -64,14 +56,14 @@ export function refresh (db:Database) {
     try {
       db.exec(`drop table if exists ${table};`)
     } catch (e) {
-      warn(`failed to drop table ${table}:`, e.message)
+      warn(`db/refresh: failed to drop table ${table}:`, e.message)
     }
   }
 
   setUserVersion(db, 0)
   db.exec(`vacuum`)
 
-  info('refresh: done')
+  info('db/refresh: done')
 }
 
 

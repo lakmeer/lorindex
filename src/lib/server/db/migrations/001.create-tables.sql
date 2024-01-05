@@ -1,4 +1,5 @@
 
+-- Main Table
 
 create table if not exists items (
   id integer primary key autoincrement,
@@ -11,10 +12,16 @@ create table if not exists items (
   data blob
 );
 
+
+-- Tags
+
 create table if not exists tags (
   id integer primary key autoincrement,
   name text unique not null
 );
+
+
+-- Many-to-many mapping of items to tags
 
 create table if not exists item_tags (
   item_id integer not null,
@@ -23,6 +30,9 @@ create table if not exists item_tags (
   foreign key (tag_id) references tags(id),
   primary key (item_id, tag_id)
 );
+
+
+-- VSS virtual table
 
 create virtual table if not exists vss_items using vss0(
   embedding(1536)
