@@ -170,15 +170,17 @@ export function rehash () {
 export async function distance (item:Item, topic:string):Promise<number> {
   const query = await embed(topic)
 
+  const target = db.prepare(`
+    select embedding from vss_items where rowid = ?`)
+    .pluck()
+    .get(item.id)
+
   const result = db.prepare(`
-    select rowid, distance from vss_items
-    where vss_search(embedding, ?) and rowid = ?
-    limit 1`)
-    .get(JSON.stringify(query), item.id)
+    select vss_distance_l2(?, ?)`)
+    .pluck()
+    .get(JSON.stringify(query), target)
 
-  if (!result) error('db/distance', `no result for #${item.id}:${item.hash} from '${topic}'`)
-
-  return result?.distance ?? 1
+  return result ?? 1
 }
 
 
