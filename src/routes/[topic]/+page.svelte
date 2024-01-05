@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
-  import { log, info } from '$lib/log.client'
+  import { ok, info } from '$lib/log.client'
   import { getJson } from '$lib/utils'
 
   import Topic       from '$comp/Topic.svelte';
@@ -20,10 +20,9 @@
 
   async function getItems (newTopic:string) {
     topic = newTopic
-    info('topic/getItems', topic)
-    items = await getJson('/api/topic/', { topic })
-
-    log('topic/getItems', items[0])
+    info('topic/getItems', topic, limit, threshold)
+    items = await getJson('/api/topic/', { topic, limit, threshold })
+    ok('topic/getItems', topic, items.length)
   }
 
   onMount(() => {
@@ -33,13 +32,13 @@
 
   // Search paramters
 
-  let topK      = 10
+  let limit      = 10
   let threshold = 0.5
 
 </script>
 
 
-<VSSControls bind:topK bind:threshold />
+<VSSControls bind:limit bind:threshold />
 
 <main class="px-8 py-16 text-lg max-w-prose mx-auto">
   <Topic class="mb-10" topic={topic} on:change={({ detail }) => getItems(detail) } />
