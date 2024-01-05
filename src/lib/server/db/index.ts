@@ -71,6 +71,53 @@ export function rehash () {
   ok("db/rehash: done")
 }
 
+export async function topicItems (topic:string, k = 10, threshold = 0.5):Item[] {
+
+  info(`db/topic: querying ${topic}, (limit ${k})`)
+
+  // TODO: Threshold control
+
+  const query = await embed(topic)
+
+  const items = db.prepare(`
+    select items.* from items join (
+      select rowid, distance
+      from vss_items
+      where vss_search(embedding, ?)
+      limit ?
+    ) as hits on items.rowid = hits.rowid;`)
+    .all(JSON.stringify(query), k)
+
+  ok("db/topic:", topic, items.length, 'items')
+
+  return items
+}
+
+export async function updateTextItem (id:number, data:Partial<Item>) {
+
+  info('db/update: updating item', id)
+
+  const hash = MD5(data.content).toString()
+  const embedding = await embed(data.desc + " " + data.content)
+
+  db.prepare(`
+    update items set
+      hash = ?,
+      desc = ?,
+      content = ?
+    where id = ?`)
+    .run(hash, data.desc, data.content, id)
+
+  db.prepare(`
+    delete from vss_items where rowid = ?;`)
+    .run(id)
+
+  db.prepare(`
+    insert into vss_items (rowid, embedding) values (?, ?)`)
+    .run(id, JSON.stringify(embedding))
+
+}
+
 
 // Export instance
 
