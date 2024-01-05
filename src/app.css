@@ -2,3 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .debug, .debug * {
+    box-shadow: 0 0 0 1px theme('colors.slate.500') inset;
+  }
+}

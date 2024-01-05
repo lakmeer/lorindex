@@ -5,6 +5,7 @@ declare namespace App {
 	interface Locals {
     db: Database
     topic: string
+    settings: Settings
   }
 
 	// interface PageData {}
@@ -33,6 +34,11 @@ declare type Item = {
   content?: string
   data?: Buffer
   distance: number
+}
+
+declare type Settings = {
+  limit: number
+  threshold: number
 }
 
 

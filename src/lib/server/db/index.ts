@@ -9,8 +9,6 @@ import { warn, ok, info, log }from '$lib/log'
 import { xformItemRowToItem } from '$lib/server/db/xform'
 
 const DB_PATH = ':memory:' // './src/lib/server/db/main.db'
-const DEFAULT_LIMIT = 10
-
 
 
 //
@@ -101,9 +99,11 @@ export async function updateTextItem (id:number, data:Partial<Item>):Promise<Ite
     insert into vss_items (rowid, embedding) values (?, ?)`)
     .run(id, JSON.stringify(embedding))
 
-  return db.prepare(`
+  const item = db.prepare(`
     select * from items where id = ?`)
     .get(id)
+
+  return xformItemRowToItem(item)
 }
 
 

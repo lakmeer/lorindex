@@ -20,7 +20,7 @@
 </script>
 
 
-<div class="flex {$$restProps.class}">
+<h1 class="flex {$$restProps.class}">
   <input class="text-3xl flex-1"
     name="topic"
     type="text"
@@ -29,4 +29,4 @@
     on:keyup={updateUrl}
     on:keyup={debounce(500, setTopic)}
   />
-</div>
+</h1>
