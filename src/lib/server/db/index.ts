@@ -122,6 +122,16 @@ export async function updateTextItem (id:number, data:Partial<Item>):Promise<Ite
 // Utils
 //
 
+// Count items
+
+export function total () {
+  return db.prepare(`
+    select count(*) as count from items`)
+    .pluck()
+    .get()
+}
+
+
 // Check for missing embeddings and fill them in
 
 export async function refill () {
@@ -129,7 +139,7 @@ export async function refill () {
     select * from items where rowid not in (select rowid from vss_items)`)
     .all()
 
-  if (items.length === 0) return ok(`db/refill: all ok`)
+  if (items.length === 0) return log(`db/refill`, '✔')
 
   warn('db/refill', `${items.length} items are missing embeddings`)
 
@@ -138,6 +148,28 @@ export async function refill () {
     db.prepare(`
       insert into vss_items (rowid, embedding) values (?, ?)`)
       .run(item.id, JSON.stringify(embedding))
+  }
+
+  ok('db/refill', 'done')
+}
+
+
+// Check for orphaned embeddings
+
+export async function clean () {
+  const orphanIds = db.prepare(`
+    select rowid from vss_items where rowid not in (select id from items)`)
+    .pluck()
+    .all()
+
+  if (orphanIds.length === 0) return log(`db/clean`, '✔')
+
+  warn('db/clean', `${orphanIds.length} orphaned embeddings`)
+
+  for (const id of orphanIds) {
+    db.prepare(`
+      delete from vss_items where rowid = ?`)
+      .run(id)
   }
 
   ok('db/refill', 'done')
@@ -223,7 +255,6 @@ export function saveCachedEmbedding (hash:string, embedding:Vector) {
 }
 
 
-
 //
 // Export instance
 //
@@ -261,9 +292,10 @@ if (PROTECT_DB) {
 }
 */
 
-ok('db/init', 'done')
+ok('db/init', 'loaded', total(), 'items')
 
 migrate(db)
+clean()
 await refill()
 
 

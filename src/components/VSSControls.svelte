@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte'
   import { postJson } from '$lib/utils'
 
+  export let title:string
   export let limit:number
   export let threshold:number
 
@@ -17,8 +18,10 @@
 <div class="
   items-center
   text-right text-slate-700 text-sm
-  grid grid-cols-3 gap-4
+  grid grid-cols-3 gap-2
   [grid-template-columns:auto_2rem_1fr]">
+
+  <h2 class="text-center col-span-3 font-bold mb-2 uppercase">{title}</h2>
 
   <div class="grid col-span-3 grid-cols-subgrid">
     <label for="limit">Limit</label>

@@ -2,12 +2,11 @@
 import OpenAI from 'openai'
 import MD5 from "crypto-js/md5"
 import fs from 'fs'
-import { ai } from '$lib/log'
+import { ai, log } from '$lib/log'
 
 import { getCachedEmbedding, saveCachedEmbedding } from '$lib/server/db'
 
 import { OPENAI_API_KEY } from '$env/static/private'
-
 
 
 // Global State
@@ -23,7 +22,7 @@ export async function embed (text:string):Vector {
   let embedding = getCachedEmbedding(hash)
 
   if (embedding) {
-    ai('openai/embed', `${hash} is cached`)
+    log('openai/embed', `${hash} is cached`)
     return embedding
   }
 

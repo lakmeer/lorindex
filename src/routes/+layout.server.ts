@@ -1,7 +1,8 @@
 
 export async function load ({ locals }) {
   return {
-    topic: locals.topic,
+    db:       locals.db,
+    topic:    locals.topic,
     settings: locals.settings
   }
 }

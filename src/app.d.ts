@@ -3,7 +3,7 @@
 
 declare namespace App {
 	interface Locals {
-    db: Database
+    db: string
     topic: string
     settings: Settings
   }

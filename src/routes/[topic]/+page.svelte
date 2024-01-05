@@ -63,7 +63,7 @@
 <main class="mx-auto flex min-h-screen">
   <aside class="px-8 bg-slate-200 border-r border-slate-500 min-w-aside min-h-full">
     <div class="h-32 grid items-center mt-1">
-      <VSSControls bind:limit bind:threshold on:change={() => getItems(topic)} />
+      <VSSControls title={data.db} bind:limit bind:threshold on:change={() => getItems(topic)} />
     </div>
   </aside>
 

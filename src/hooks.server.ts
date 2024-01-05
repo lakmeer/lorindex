@@ -1,10 +1,10 @@
 
-import db from '$lib/server/db'
-
-import { DEFAULT_LIMIT, DEFAULT_THRESHOLD, KEY_SETTINGS } from '$lib/const'
-
 import { unslugify } from '$lib/utils'
 import { info } from '$lib/log'
+
+import { DB_NAME } from '$env/static/private'
+import { DEFAULT_LIMIT, DEFAULT_THRESHOLD, KEY_SETTINGS } from '$lib/const'
+
 
 const defaultSettings:Settings = {
   limit:     DEFAULT_LIMIT,
@@ -19,7 +19,7 @@ export async function handle({ event, resolve }) {
     event.cookies.set(KEY_SETTINGS, JSON.stringify(defaultSettings), { path: '/' })
   }
 
-  event.locals.db       = db
+  event.locals.db       = DB_NAME
   event.locals.topic    = unslugify(event.params.topic ?? '')
   event.locals.settings = JSON.parse(event.cookies.get(KEY_SETTINGS)) as Settings
 
