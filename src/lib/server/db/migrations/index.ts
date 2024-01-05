@@ -28,12 +28,12 @@ export function migrate (db:Db) {
 
   let work = false
 
-  log('db/migrate: current version is', version)
+  log('db/migrate', 'current version is', version)
 
   for (let migration of migrations) {
     if (migration.version > version) {
       work = true
-      info('db/migrate: running migration', migration.version, migration.name)
+      info('db/migrate', 'running migration', migration.version, migration.name)
       db.exec(migration.query)
       setUserVersion(db, migration.version)
     }
@@ -41,12 +41,12 @@ export function migrate (db:Db) {
 
   if (work) {
     db.exec(`vacuum`)
-    ok('db/migrate: done. new version is', getUserVersion(db))
+    ok('db/migrate', 'done. new version is', getUserVersion(db))
   }
 }
 
 export function refresh (db:Db) {
-  info('db/refresh: starting...')
+  info('db/refresh', 'starting...')
 
   const tables = db.prepare("select name from sqlite_master where type is 'table'").pluck().all()
 
@@ -56,14 +56,14 @@ export function refresh (db:Db) {
     try {
       db.exec(`drop table if exists ${table};`)
     } catch (e) {
-      warn(`db/refresh: failed to drop table ${table}:`, e.message)
+      warn('db/refresh', `failed to drop table ${table}:`, e.message)
     }
   }
 
   setUserVersion(db, 0)
   db.exec(`vacuum`)
 
-  info('db/refresh: done')
+  info('db/refresh', 'done')
 }
 
 

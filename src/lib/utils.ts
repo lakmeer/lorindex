@@ -1,0 +1,58 @@
+
+export function formAsJson (data:FormData):object {
+  const obj = {}
+  for (const [key, value] of data.entries()) {
+    obj[key] = value
+  }
+  return obj
+}
+
+
+export function debounce (delay:number, λ:Function) {
+  let timer:NodeJS.Timeout
+
+  return (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => λ(...args), delay)
+  }
+}
+
+
+export function getJson<T> (url:string, data:object):Promise<T> {
+  const params = new URLSearchParams()
+
+  for (const key in data) {
+    params.append(key, data[key])
+  }
+
+  return fetch(url + '?' + params.toString(), {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  }).then(response => response.json())
+}
+
+
+export function postJson<T> (url:string, data:object):Promise<PostResult<T>> {
+  const params = new URLSearchParams()
+
+  for (const key in data) {
+    params.append(key, data[key])
+  }
+
+  return fetch(url + '?' + params.toString(), {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.error) {
+      return { error: true, message: result.message } as PostResult<T>
+    } else {
+      return { error: false, data: result } as PostResult<T>
+    }
+  })
+  .catch(error => {
+    return { error: true, message: error.message } as PostResult<T>
+  })
+}
+

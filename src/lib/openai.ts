@@ -6,7 +6,6 @@ import { ai } from '$lib/log'
 
 import { OPENAI_API_KEY } from '$env/static/private'
 
-console.log(MD5("Message").toString());
 
 
 // Global State
@@ -36,13 +35,13 @@ export async function embed (text:string):Vector {
   const hash = MD5(text).toString()
 
   if (memo[hash]) {
-    ai(`openai/embed: ${hash} is cached`)
+    ai('openai/embed', `${hash} is cached`)
     return memo[hash]
   }
 
   const time = performance.now()
 
-  ai(`openai/embed: embedding ${hash}...`)
+  ai('openai/embed', `embedding ${hash}...`)
 
   const embedding = await openai.embeddings.create({
     model: 'text-embedding-ada-002',
@@ -52,7 +51,7 @@ export async function embed (text:string):Vector {
 
   addMemo(hash, embedding.data[0].embedding)
 
-  ai(`openai/embed: done in ${Math.floor(performance.now() - time)/1000} seconds`)
+  ai('openai/embed', `done in ${Math.floor(performance.now() - time)/1000} seconds`)
 
   return embedding.data[0].embedding
 }
