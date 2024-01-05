@@ -51,3 +51,12 @@ export function postJson<T> (url:string, data:object):Promise<PostResult<T>> {
   })
 }
 
+
+export function slugify (text:string):string {
+  return text.toLowerCase().replace(/\s+/g, '-')
+}
+
+export function unslugify (text:string):string {
+  return text.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+}
+

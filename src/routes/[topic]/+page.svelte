@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { fly } from 'svelte/transition'
-  import { ok, log } from '$lib/log.client'
+  import { ok, warn, log } from '$lib/log.client'
   import { getJson } from '$lib/utils'
 
   import Topic       from '$comp/Topic.svelte'
@@ -17,15 +17,13 @@
 
   let topic:string = data.topic
   let items: Item[] = []
-
   let status:Status = 'done'
 
   async function getItems (newTopic:string) {
-    topic = newTopic
+    log('Main/getItems', newTopic, limit, threshold)
     status = 'pending'
-    log('Main/getItems', topic, limit, threshold)
-
-    items = await getJson('/api/topic/', { topic, limit, threshold })
+    topic  = newTopic
+    items  = await getJson('/api/topic/', { topic, limit, threshold })
     status = 'done'
     ok('Main/getItems', `${items.length} results for '${topic}'`)
   }
@@ -40,13 +38,17 @@
   let limit     = data.settings.limit
   let threshold = data.settings.threshold
 
-  function pop (event) {
-    log('pop', event)
+  function pop (event:PopStateEvent) {
+    log('Main/pop', event.state.topic)
+
+    if (event.state.topic) {
+      getItems(event.state.topic)
+    } else {
+      warn('Main/pop', 'no topic in state')
+    }
   }
 </script>
 
-
-<svelte:window on:popstate={pop} />
 
 <main class="mx-auto flex min-h-screen">
   <aside class="px-8 bg-slate-200 border-r border-slate-500 min-w-aside min-h-full">
@@ -60,7 +62,7 @@
       <Topic topic={topic} on:change={({ detail }) => getItems(detail) } />
     </div>
 
-    <div class="space-y-6">
+    <div class="space-y-6 mb-6">
       {#each items as item, ix}
         {#key item.id}
           <div in:fly={{ y: 20, duration: 200, delay: ix * 100 }}>
@@ -73,3 +75,5 @@
     <NewTextItem on:submit={({ detail }) => items.push(detail)} />
   </article>
 </main>
+
+<svelte:window on:popstate={pop} />

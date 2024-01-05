@@ -1,30 +1,25 @@
 <script lang="ts">
 
   import { createEventDispatcher } from 'svelte'
-  import { debounce } from '$lib/utils'
+  import { debounce, slugify } from '$lib/utils'
   import { info, warn, ok } from '$lib/log.client'
 
   const dispatch = createEventDispatcher()
 
   export let topic:string
 
-  let internal:string = topic
+  $: internal = topic
 
   function setTopic () {
-    if (internal === '') return warn('Topic/setTopic', 'is empty')
-    if (history.state?.topic == topic) return warn('Topic/setTopic', 'no change')
+    if (internal === '') return warn('Topic/setTopic', 'empty topic')
+    if (history.state?.topic === internal) return warn('Topic/setTopic', 'no change')
 
     topic = internal
-
-    info('Topic/setTopic', topic)
-
+    history.pushState({ topic }, '', '/' + slugify(topic))
     dispatch('change', topic)
-
-    history.pushState({ topic }, '', '/' + encodeURIComponent(topic))
-
-    ok('Topic/setTopic', topic, history.state)
-
+    info('Topic/setTopic', topic, history.state)
   }
+
 </script>
 
 

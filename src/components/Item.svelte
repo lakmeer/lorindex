@@ -29,7 +29,7 @@
 
     <div class="text-sm my-3"> <strong>{desc}</strong> </div>
     <div class="text-xs"> <strong>Updated At:</strong> {time} </div>
-    <div class="text-xs"> <strong>Similarity:</strong> {(1 - distance).toFixed(3)} </div>
+    <div class="text-xs"> <strong>Distance:</strong> {distance.toFixed(3)} </div>
   </div>
 
   <slot />
