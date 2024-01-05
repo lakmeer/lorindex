@@ -31,15 +31,15 @@ export async function newTextItem (desc:string, content:string, tags:string[] = 
     .run(db.lastInsertRowid, JSON.stringify(embedding))
 }
 
-export async function fill () {
+export async function refill () {
 
   const items = db.prepare(`
     select * from items where rowid not in (select rowid from vss_items)`)
     .all()
 
-  if (items.length === 0) return ok(`db/fill: all ok`)
+  if (items.length === 0) return ok(`db/refill: all ok`)
 
-  warn(`db/fill: ${items.length} items are missing embeddings`)
+  warn(`db/refill: ${items.length} items are missing embeddings`)
 
   for (const item of items) {
     const embedding = await embed(item.desc + " " + item.content)
@@ -48,7 +48,7 @@ export async function fill () {
       .run(item.id, JSON.stringify(embedding))
   }
 
-  ok(`db/fill: done`)
+  ok(`db/refill: done`)
 }
 
 export function rehash () {
@@ -78,7 +78,7 @@ const db = new Database(DB_PATH)
 db.pragma('journal_mode = WAL')
 VSS.load(db)
 migrate(db)
-fill()
+refill()
 
 
 export default db
