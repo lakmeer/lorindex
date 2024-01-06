@@ -2,7 +2,7 @@
 import type { RequestHandler } from './$types'
 
 import { info, ok } from '$lib/log'
-import { updateTextItem } from '$lib/server/db'
+import { updateTextItem } from '$lib/server/db/items'
 
 
 //

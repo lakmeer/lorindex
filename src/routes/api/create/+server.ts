@@ -2,7 +2,7 @@
 import type { RequestHandler } from './$types'
 
 import { log, ok } from '$lib/log'
-import { createTextItem, distance } from '$lib/server/db'
+import { createTextItem, distance } from '$lib/server/db/items'
 
 
 //

@@ -4,7 +4,7 @@
 🟢 Hook up similarity controls
 🔴 Tags
   🔴 Auto-tagging
-🟡 Automatically create description text
+🟢 Automatically create description text
 🟢 Update 001 migration
 🟢 Move embedding cache to db
   🟤 Protect test db using in-memory clone

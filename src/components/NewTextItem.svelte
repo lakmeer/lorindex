@@ -45,7 +45,7 @@
   distance={1} {status}>
 
   <div
-    class="border border-slate-400 block w-full min-h-[3rem]"
+    class="border border-slate-400 block w-full min-h-[8rem]"
     on:input={() => status = 'modified'}
     on:blur={submit}
     contenteditable

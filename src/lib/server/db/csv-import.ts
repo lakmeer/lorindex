@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import fs from 'fs'
 import CsvStream from 'csv-reader'

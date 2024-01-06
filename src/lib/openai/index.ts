@@ -5,7 +5,7 @@ import fs from 'fs'
 import { ai, log, info } from '$lib/log'
 import { fillPrompt } from '$lib/utils'
 
-import { getCachedEmbedding, saveCachedEmbedding } from '$lib/server/db'
+import { getCachedEmbedding, saveCachedEmbedding } from '$lib/server/db/cache'
 
 import { OPENAI_API_KEY } from '$env/static/private'
 
