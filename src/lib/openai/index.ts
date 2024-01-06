@@ -2,10 +2,11 @@
 import OpenAI from 'openai'
 import MD5 from "crypto-js/md5"
 import fs from 'fs'
+
 import { ai, log, info } from '$lib/log'
 import { fillPrompt } from '$lib/utils'
-
 import { getCachedEmbedding, saveCachedEmbedding } from '$lib/server/db/cache'
+import { getCachedSummary, saveCachedSummary } from '$lib/server/db/cache'
 
 import { OPENAI_API_KEY } from '$env/static/private'
 
@@ -61,6 +62,13 @@ export async function summary (text:string):string {
   const hash = MD5(text).toString()
   const time = performance.now()
 
+  let summary = getCachedSummary(hash)
+
+  if (summary) {
+    log('openai/summary', `${hash} is cached`)
+    return summary
+  }
+
   const completion = await openai.completions.create({
     model: 'gpt-3.5-turbo-instruct',
     prompt: fillPrompt(SUMMARY_PROMPT, { text }),
@@ -71,7 +79,10 @@ export async function summary (text:string):string {
 
   // 🔴 Look for failure cases like 'Unknown topic'
 
-  const summary   = completion.choices[0].text.trim()
+  summary  = completion.choices[0].text.trim()
+
+  saveCachedSummary(hash, summary)
+
   const totalTime = Math.floor(performance.now() - time)/1000
   const tokens    = completion.usage.prompt_tokens + '+' + completion.usage.completion_tokens
 

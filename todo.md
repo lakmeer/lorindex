@@ -6,6 +6,8 @@
   🔴 Auto-tagging
 🟢 Automatically create description text
 🟢 Update 001 migration
+  🔴 Use hash as primary key
+  🔴 Detect collisions
 🟢 Move embedding cache to db
   🟤 Protect test db using in-memory clone
 🔴 Cancel inflight requests when topic changes
@@ -22,3 +24,4 @@
 🔴 Cache summaries
 🔴 Collect constants into one file
   🔴 Make configurable
+
