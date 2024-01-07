@@ -63,8 +63,7 @@ export async function describe (db:Db) {
 
   for (const item of items) {
     log('db/describe', 'resummarizing', item)
-    console.log(summarize)
-    const desc = await summarize(item.content)
+    const desc = await summary(item.content)
 
     db.prepare(`
       update items set desc = ? where id = ?`)
