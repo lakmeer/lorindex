@@ -21,7 +21,7 @@
 🔴 Add image items
 🔴 Delete items
 🔴 Track token usage stats
-🔴 Cache summaries
+🟢 Cache summaries
 🔴 Collect constants into one file
   🔴 Make configurable
 

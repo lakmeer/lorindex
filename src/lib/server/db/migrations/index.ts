@@ -42,6 +42,8 @@ export function migrate (db:Db) {
   if (work) {
     db.exec(`vacuum`)
     ok('db/migrate', 'done. new version is', getUserVersion(db))
+  } else {
+    log('db/migrate', `✔ v${version}`)
   }
 }
 

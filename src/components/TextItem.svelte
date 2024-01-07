@@ -6,12 +6,11 @@
 
   export let id:       Item['id']
   export let time:     Item['time']
-  export let type:     Item['type']
   export let hash:     Item['hash']
   export let desc:     Item['desc']
   export let distance: Item['distance']
   export let content:  Item['content'] = ""
-
+  export const type:   Item['type'] = 'text'
 
   let status : Status = 'done'
 

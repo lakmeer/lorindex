@@ -5,14 +5,11 @@
 
 import MD5 from 'crypto-js/md5'
 
-import { embed, summary }     from '$lib/openai'
-
+import { embed, summarize }     from '$lib/openai'
 import { warn, ok, info, log, error } from '$lib/log'
+import db from '$lib/server/db/instance'
 
 import { DEFAULT_LIMIT, DEFAULT_THRESHOLD } from '$lib/const'
-
-
-import db from '$lib/server/db/instance'
 
 
 
@@ -61,7 +58,7 @@ export async function getItemsByTopic (topic:string, k = DEFAULT_LIMIT, threshol
 
 export async function createTextItem (content:string, tags:string[] = []) {
   const hash      = MD5(content).toString()
-  const desc      = await summary(content)
+  const desc      = await summarize(content)
   const embedding = await embed(desc + ' ' + content)
 
   // 🔴 Tags
