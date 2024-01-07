@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { postJson } from '$lib/utils'
-  import { createEventDispatcher } from 'svelte'
-
   export let time:     Item['time']
   export let type:     Item['type']
   export let hash:     Item['hash']
@@ -9,43 +6,6 @@
   export let distance: Item['distance']
 
   export let status : Status = 'done'
-
-  const dispatch = createEventDispatcher()
-
-  async function deleteItem () {
-    if (status === 'pending') return
-
-    status = 'pending'
-
-    const result = await postJson('/api/delete', { hash })
-
-    if (result.error) {
-      status = 'done'
-    } else {
-      dispatch('deleted')
-    }
-  }
-
-  async function newDescription () {
-    if (status === 'pending') return
-
-    status = 'pending'
-
-    const newDesc = prompt('New Description', desc)
-
-    if (!newDesc) return
-
-    const result = await postJson('/api/describe', { hash, desc: newDesc })
-
-    if (result.error) {
-      status = 'done'
-    } else {
-      desc = newDesc
-      status = 'done'
-    }
-  }
-
-
 </script>
 
 
@@ -73,20 +33,6 @@
       <div class="text-xs"> <strong>Updated At:</strong> {time} </div>
       <div class="text-xs"> <strong>Distance:</strong> {distance.toFixed(3)} </div>
     {/if}
-
-    <div class="flex items-center text-sm space-x-2 font-bold">
-      <button type="button" class="border border-green-500 px-2 py-1 flex items-center space-x-2"
-        on:click={newDescription}>
-        <span class="text-xs font-bold"> Describe </span>
-        <span>  </span>
-      </button>
-
-      <button type="button" class="border border-red-500 px-2 py-1 flex items-center space-x-2"
-        on:click={deleteItem}>
-        <span class="text-xs font-bold"> Delete  </span>
-        <span> ❌ </span>
-      </button>
-    </div>
   </div>
 
   <slot />

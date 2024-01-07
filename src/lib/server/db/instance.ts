@@ -104,7 +104,7 @@ await describe(db)
 
 // Done
 
-info('db/init', 'loaded', total(), 'items')
+log('db/init', `loaded ${total()} items`)
 ok('db/init', 'done')
 
 export default db

@@ -24,4 +24,5 @@
 🟢 Cache summaries
 🔴 Collect constants into one file
   🔴 Make configurable
+🔴 Attempting to save an item with zero content should delete it
 

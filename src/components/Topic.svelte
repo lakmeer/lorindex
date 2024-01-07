@@ -19,7 +19,6 @@
     dispatch('change', topic)
     info('Topic/setTopic', topic, history.state)
   }
-
 </script>
 
 

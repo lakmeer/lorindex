@@ -28,8 +28,6 @@ export function migrate (db:Db) {
 
   let work = false
 
-  log('db/migrate', 'current version is', version)
-
   for (let migration of migrations) {
     if (migration.version > version) {
       work = true
