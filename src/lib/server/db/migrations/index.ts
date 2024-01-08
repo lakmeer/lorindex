@@ -1,9 +1,6 @@
 
-import type { Database } from 'better-sqlite3'
 import { log, info, warn, ok } from '$lib/log'
 import fs from 'fs'
-
-type Db = typeof Database
 
 const DB_MIGRATIONS_PATH = './src/lib/server/db/migrations'
 

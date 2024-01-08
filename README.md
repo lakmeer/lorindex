@@ -1,5 +1,4 @@
 
-
 # Lorindex
 
 A structureless wiki.

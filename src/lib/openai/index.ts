@@ -22,10 +22,10 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY })
 
 // Embed new text
 
-export async function embed (text:string):Vector {
+export async function embed (db:Db, text:string):Vector {
   const hash = MD5(text).toString()
 
-  let embedding = getCachedEmbedding(hash)
+  let embedding = getCachedEmbedding(db, hash)
 
   if (embedding) {
     log('openai/embed', `${hash} is cached`)
@@ -42,7 +42,7 @@ export async function embed (text:string):Vector {
     encoding_format: 'float',
   })
 
-  saveCachedEmbedding(hash, embedding.data[0].embedding)
+  saveCachedEmbedding(db, hash, embedding.data[0].embedding)
 
   ai('openai/embed', `done in ${Math.floor(performance.now() - time)/1000} seconds`)
 
@@ -52,7 +52,7 @@ export async function embed (text:string):Vector {
 
 // Summarise a text snippet
 
-export async function summary (text:string):string {
+export async function summary (db:Db, text:string):string {
 
   if (text.length < MIN_TEXT_LENGTH) {
     warn('openai/summary', `text too short: ${text}`)
@@ -62,7 +62,7 @@ export async function summary (text:string):string {
   const hash = MD5(text).toString()
   const time = performance.now()
 
-  let summary = getCachedSummary(hash)
+  let summary = getCachedSummary(db, hash)
 
   if (summary) {
     log('openai/summary', `${hash} is cached`)
@@ -79,9 +79,9 @@ export async function summary (text:string):string {
 
   // 🔴 Look for failure cases like 'Unknown topic'
 
-  summary  = completion.choices[0].text.trim()
+  summary = completion.choices[0].text.trim()
 
-  saveCachedSummary(hash, summary)
+  saveCachedSummary(db, hash, summary)
 
   const totalTime = Math.floor(performance.now() - time)/1000
   const tokens    = completion.usage.prompt_tokens + '+' + completion.usage.completion_tokens

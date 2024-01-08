@@ -1,9 +1,6 @@
 
-import type { Database } from 'better-sqlite3'
-type Db = typeof Database
-
 import { embed, summary } from '$lib/openai'
-import { log } from '$lib/log'
+import { log, warn, ok } from '$lib/log'
 
 
 // Check for missing embeddings and fill them in
@@ -18,7 +15,7 @@ export async function refill (db:Db) {
   warn('db/refill', `${items.length} items are missing embeddings`)
 
   for (const item of items) {
-    const embedding = await embed(item.desc + ' ' + item.content)
+    const embedding = await embed(db, item.desc + ' ' + item.content)
     db.prepare(`
       insert into vss_items (rowid, embedding) values (?, ?)`)
       .run(item.id, JSON.stringify(embedding))
@@ -63,7 +60,7 @@ export async function describe (db:Db) {
 
   for (const item of items) {
     log('db/describe', 'resummarizing', item)
-    const desc = await summary(item.content)
+    const desc = await summary(db, item.content)
 
     db.prepare(`
       update items set desc = ? where id = ?`)

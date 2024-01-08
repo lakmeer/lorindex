@@ -17,6 +17,8 @@ declare namespace App {
 // External Modules
 
 declare module 'better-sqlite3'
+import type { Database } from 'better-sqlite3'
+declare type Db = typeof Database
 
 
 // Domain Objects

@@ -67,3 +67,7 @@ export function fillPrompt (prompt:string, data:object):string {
     .replace(/{{(.*?)}}/g, (_, key) => data[key.trim()])
 }
 
+export async function defer () {
+  return new Promise(resolve => setTimeout(resolve, 0))
+}
+

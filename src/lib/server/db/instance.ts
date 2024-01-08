@@ -8,6 +8,7 @@ import * as VSS from 'sqlite-vss'
 import fs from 'fs'
 
 import { warn, ok, info, log, error } from '$lib/log'
+import { defer } from '$lib/utils'
 
 import { migrate } from '$lib/server/db/migrations'
 import { clean, refill, describe } from '$lib/server/db/housework'
@@ -94,6 +95,8 @@ if (PROTECT_DB && BACKUP_MODE === 'memory') {
 
 
 // Housework
+
+await defer() // lets modules resolve before using OAI features
 
 migrate(db)
 clean(db)

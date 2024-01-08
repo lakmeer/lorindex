@@ -1,12 +1,11 @@
 
 import { warn } from '$lib/log'
 
-import db from '$lib/server/db/instance'
 
 
 // Cache embedding results
 
-export function getCachedEmbedding (hash:MD5Hash):Vector|null {
+export function getCachedEmbedding (db:Db, hash:MD5Hash):Vector|null {
   const embedding = db.prepare(`
     select embedding from embedding_cache where hash = ?`)
     .pluck()
@@ -17,7 +16,7 @@ export function getCachedEmbedding (hash:MD5Hash):Vector|null {
   return null
 }
 
-export function saveCachedEmbedding (hash:MD5Hash, embedding:Vector) {
+export function saveCachedEmbedding (db:Db, hash:MD5Hash, embedding:Vector) {
   let result =  db.prepare(`
     insert or ignore into embedding_cache (hash, embedding) values (?, ?)`)
     .run(hash, JSON.stringify(embedding))
@@ -28,7 +27,7 @@ export function saveCachedEmbedding (hash:MD5Hash, embedding:Vector) {
 
 // Cache summary text
 
-export function getCachedSummary (hash:MD5Hash):string|null {
+export function getCachedSummary (db:Db, hash:MD5Hash):string|null {
   const summary = db.prepare(`
     select summary from summary_cache where hash = ?`)
     .pluck()
@@ -39,8 +38,8 @@ export function getCachedSummary (hash:MD5Hash):string|null {
   return null
 }
 
-export function saveCachedSummary (hash:MD5Hash, summary:string) {
-  let result =  db.prepare(`
+export function saveCachedSummary (db:Db, hash:MD5Hash, summary:string) {
+  let result = db.prepare(`
     insert or ignore into summary_cache (hash, summary) values (?, ?)`)
     .run(hash, summary)
 

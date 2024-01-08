@@ -5,7 +5,7 @@
 
 import MD5 from 'crypto-js/md5'
 
-import { embed, summarize }     from '$lib/openai'
+import { embed, summary } from '$lib/openai'
 import { warn, ok, info, log, error } from '$lib/log'
 import db from '$lib/server/db/instance'
 
@@ -32,7 +32,7 @@ export function allItems (limit:number = DEFAULT_LIMIT):Item[] {
 export async function getItemsByTopic (topic:string, k = DEFAULT_LIMIT, threshold = DEFAULT_THRESHOLD):Promise<Item[]> {
   info('db/topic', `query ${topic}, (limit ${k}, thresh ${threshold})`)
 
-  const query = await embed(topic)
+  const query = await embed(db, topic)
 
   const items = db.prepare(`
     select items.*, hits.distance, hits.rowid as rowid from items join (
@@ -58,8 +58,8 @@ export async function getItemsByTopic (topic:string, k = DEFAULT_LIMIT, threshol
 
 export async function createTextItem (content:string, tags:string[] = []) {
   const hash      = MD5(content).toString()
-  const desc      = await summarize(content)
-  const embedding = await embed(desc + ' ' + content)
+  const desc      = await summary(db, content)
+  const embedding = await embed(db, desc + ' ' + content)
 
   // 🔴 Tags
 
@@ -86,10 +86,11 @@ export async function createTextItem (content:string, tags:string[] = []) {
 export async function updateTextItem (id:number, data:Partial<Item>):Promise<Item> {
   info('db/update: updating item', id)
 
-  // 🔴 Work out whether desc needs to be recalculated
-
   const hash = MD5(data.content).toString()
-  const embedding = await embed(data.desc + ' ' + data.content)
+  const desc = await summary(db, data.content)
+  const embedding = await embed(db, desc + ' ' + data.content)
+
+  // 🔴 Tags
 
   db.prepare(`
     update items set
@@ -97,7 +98,7 @@ export async function updateTextItem (id:number, data:Partial<Item>):Promise<Ite
       desc = ?,
       content = ?
     where id = ?`)
-    .run(hash, data.desc, data.content, id)
+    .run(hash, desc, data.content, id)
 
   db.prepare(`
     delete from vss_items where rowid = ?;`)
@@ -123,7 +124,7 @@ export async function updateTextItem (id:number, data:Partial<Item>):Promise<Ite
 // Get a single distance for a given item and topic
 
 export async function distance (item:Item, topic:string):Promise<number> {
-  const query = await embed(topic)
+  const query = await embed(db, topic)
 
   const target = db.prepare(`
     select embedding from vss_items where rowid = ?`)

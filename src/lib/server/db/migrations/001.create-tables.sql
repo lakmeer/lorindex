@@ -2,13 +2,20 @@
 -- Main Table
 
 create table if not exists items (
-  id integer primary key autoincrement,
+  id integer primary key,
   last_update timestamp default (unixepoch('now')),
-  hash text not null,
+  hash text not null unique,
   type text not null check(type in ('text', 'image', 'audio', 'link')),
   desc text,
   content text,
   data blob
+);
+
+
+-- VSS virtual table
+
+create virtual table if not exists vss_items using vss0(
+  embedding(1536)
 );
 
 
@@ -28,13 +35,6 @@ create table if not exists item_tags (
   foreign key (item_id) references items(id),
   foreign key (tag_id) references tags(id),
   primary key (item_id, tag_id)
-);
-
-
--- VSS virtual table
-
-create virtual table if not exists vss_items using vss0(
-  embedding(1536)
 );
 
 
