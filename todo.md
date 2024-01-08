@@ -48,7 +48,7 @@
      request only when slider is released
 🟢 Cache summaries
 🟢 Move embedding cache to db
-  🟠 Protect test db using in-memory clone
+  🟢 Protect test db using in-memory clone
 🔴 Cancel inflight requests when topic changes
 🟢 Use `vss_distance_l2` for `db/distance`
 
