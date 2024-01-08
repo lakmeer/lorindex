@@ -71,8 +71,6 @@ if (!fs.existsSync(DB_PATH)) {
 }
 
 
-// Create or restore transient backup
-
 // Create and configure
 
 info('db/init', `loading database '${DB_NAME}'`)
