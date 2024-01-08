@@ -16,8 +16,8 @@ import { clean, refill, describe } from '$lib/server/db/housework'
 import { DB_NAME } from '$env/static/private'
 
 
-const PROTECT_DB = false
-const BACKUP_MODE : 'filesystem' | 'memory' = 'filesystem'
+const PROTECT_DB = true
+const BACKUP_MODE : 'filesystem' | 'memory' = 'memory'
 
 const DB_PATH = `./src/lib/server/db/data/${DB_NAME}.db`
 
@@ -48,12 +48,12 @@ function filesystemBackup () {
 function memoryBackup () {
   info('db/init', 'copying test database to memory')
 
-  //db.pragma('journal_mode = DELETE')
+  db.pragma('journal_mode = DELETE')
   const buffer = db.serialize()
   db.close()
 
   db = new Database(buffer)
-  //db.pragma('journal_mode = WAL')
+  db.pragma('journal_mode = WAL')
   VSS.load(db)
 }
 
@@ -73,30 +73,20 @@ if (!fs.existsSync(DB_PATH)) {
 
 // Create or restore transient backup
 
-if (PROTECT_DB && BACKUP_MODE === 'filesystem') {
-  filesystemBackup()
-}
-
-
 // Create and configure
 
 info('db/init', `loading database '${DB_NAME}'`)
 
+if (PROTECT_DB && BACKUP_MODE === 'filesystem') filesystemBackup()
+
 let db = new Database(DB_PATH)
-//db.pragma('journal_mode = WAL')
+db.pragma('journal_mode = WAL')
 VSS.load(db)
 
-
-// In-memory backup (when it works)
-
-if (PROTECT_DB && BACKUP_MODE === 'memory') {
-  memoryBackup()
-}
+if (PROTECT_DB && BACKUP_MODE === 'memory') memoryBackup()
 
 
 // Housework
-
-await defer() // lets modules resolve before using OAI features
 
 migrate(db)
 clean(db)
