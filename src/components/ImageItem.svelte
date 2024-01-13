@@ -17,7 +17,7 @@
 
 
 <ItemWrapper type='text' {id} {hash} {desc} {time} {distance} {status} {tags}>
-  <div class="block w-full">
-    <img src="data:;base64,{data}" alt={desc} class="w-full" />
+  <div class="block w-2/3 aspect-square relative">
+    <img src="data:;base64,{data}" alt={desc} class="absolute object-fit" />
   </div>
 </ItemWrapper>

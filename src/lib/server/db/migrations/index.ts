@@ -119,6 +119,7 @@ for (const file of fs.readdirSync(DB_MIGRATIONS_PATH)) {
         name: name,
         script: (await import(/* @vite-ignore */ './' + file)).default
       })
+      break
 
     default:
       warn('db/migrations', `unknown migration type: ${ext}`)

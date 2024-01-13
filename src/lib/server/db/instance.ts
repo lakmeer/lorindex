@@ -12,21 +12,14 @@ import { defer } from '$lib/utils'
 
 import { DB_NAME, FREEZE_MODE } from '$env/static/private'
 
-const DB_FREEZE  = true
 const DB_PATH    = `./src/lib/server/db/data/${DB_NAME}.db`
+const DB_FREEZE  = false
 const DB_VERBOSE = false
 
 
 //
 // Utils
 //
-
-export function total () {
-  return db.prepare(`
-    select count(*) as count from items`)
-    .pluck()
-    .get()
-}
 
 function filesystemBackup () {
   if (DB_FREEZE) {
