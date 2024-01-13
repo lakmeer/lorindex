@@ -11,12 +11,12 @@ import { warn, ok, info, log, error, debug } from '$lib/log'
 import { defer } from '$lib/utils'
 
 import { migrate } from '$lib/server/db/migrations'
-import { clean, refill, describe } from '$lib/server/db/housework'
+import { clean, refill, describe, resetTable } from '$lib/server/db/housework'
 
 import { DB_NAME, FREEZE_MODE } from '$env/static/private'
 
-const DB_FREEZE = false
-const DB_PATH   = `./src/lib/server/db/data/${DB_NAME}.db`
+const DB_FREEZE  = true
+const DB_PATH    = `./src/lib/server/db/data/${DB_NAME}.db`
 const DB_VERBOSE = false
 
 

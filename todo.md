@@ -3,7 +3,7 @@
 
 ## Features
 
-🔴 Image Items
+🟡 Image Items
   🔴 Add image items
   🔴 Semantic analysis of images
   🔴 Embed generated anaylsis in OpenAI embedding space
@@ -16,7 +16,7 @@
   🟢 Add tags
   🟢 AI Auto-tagging
   🔴 Use tags somehow to improve recall accuracy
-  🔴 Tags editing
+  🔴 Manual tag editing
   🔴 Housework: identify and remove unused tags
 
 🔴 Portability
@@ -42,6 +42,7 @@
 
 ## Improvements
 
+🔴 DB transations for simultaneous requests
 🔴 Attempting to save an item with zero content should delete it
 🔴 Better layout strategy than using absolute on item panels
 🔴 Move topic and other state to svelte store/context?
