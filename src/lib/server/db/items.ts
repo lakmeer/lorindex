@@ -25,11 +25,12 @@ import { resetTable } from '$db/housework'
 export function getItemById (id:number):Item {
   const item = db.prepare(`
     select items.*, group_concat(tags.tag) as tags from items
-    join item_tags on items.id = item_tags.item_id
-    join tags on item_tags.tag_id = tags.id
+    left join item_tags on items.id = item_tags.item_id
+    left join tags on item_tags.tag_id = tags.id
     where items.id = ?
     group by items.id;`)
     .get(id) as QueryResult
+  debug('db/get', item)
   return xformItemRowToItem(item)
 }
 
@@ -39,8 +40,8 @@ export function getItemById (id:number):Item {
 export function getItemByHash (hash:MD5Hash):Item {
   const item = db.prepare(`
     select items.*, group_concat(tags.tag) as tags from items
-    join item_tags on items.id = item_tags.item_id
-    join tags on item_tags.tag_id = tags.id
+    left join item_tags on items.id = item_tags.item_id
+    left join tags on item_tags.tag_id = tags.id
     where items.hash = ?
     group by items.id;`)
     .get(hash) as QueryResult

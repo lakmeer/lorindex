@@ -16,24 +16,6 @@
 
   let status : Status = 'done'
 
-
-  async function reprocess () {
-    log('TextItem/reprocess', "Reprocessing", id)
-
-    status = 'pending'
-
-    const result = await postJson<string[]>('/api/reprocess', { id, content })
-
-    if (isError(result)) {
-      error('TextItem/reprocess', result.message)
-      status = 'modified'
-    } else {
-      tags = result.data
-      ok('TextItem/reprocess', ...result.data)
-      status = 'done'
-    }
-  }
-
   async function submit () {
     log('TextItem/submit', "Submitting", id)
 
@@ -65,8 +47,7 @@
 </script>
 
 
-<ItemWrapper type='text' {hash} {desc} {time} {distance} {status} {tags}
-  on:reprocess={reprocess}>
+<ItemWrapper type='text' {id} {hash} {desc} {time} {distance} {status} {tags}>
   <div class="block w-full"
     on:input={() => status = 'modified'}
     on:blur={submit}
