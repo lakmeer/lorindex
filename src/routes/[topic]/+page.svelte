@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { fly } from 'svelte/transition'
-  import { ok, warn, log } from '$lib/log.client'
+  import { ok, warn, log, debug } from '$lib/log.client'
   import { getJson, slugify } from '$lib/utils'
 
   import Topic       from '$comp/Topic.svelte'
@@ -29,6 +29,7 @@
     items  = await getJson('/api/topic/', { topic, limit, threshold })
     status = 'done'
     ok('Main/getItems', `${items.length} results for '${topic}'`)
+    debug('Main/getItems', items)
   }
 
   onMount(() => {

@@ -23,7 +23,7 @@ create virtual table if not exists vss_items using vss0(
 
 create table if not exists tags (
   id integer primary key autoincrement,
-  name text unique not null
+  tag text unique not null
 );
 
 

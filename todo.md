@@ -5,15 +5,19 @@
 
 🔴 Image Items
   🔴 Add image items
+  🔴 Semantic analysis of images
+  🔴 Embed generated anaylsis in OpenAI embedding space
 
 🔴 Usage stats
   🔴 Track in/out tokens when using AI endpoints
   🔴 Associate
 
-🔴 Tags
-  🔴 Auto-tagging
+🟡 Tags
+  🟢 Add tags
+  🟢 AI Auto-tagging
   🔴 Use tags somehow to improve recall accuracy
   🔴 Tags editing
+  🔴 Housework: identify and remove unused tags
 
 🔴 Portability
   🔴 Create DB table for library metadata features, such as
@@ -27,6 +31,9 @@
   🔴 Auto-hide on smaller screens
   🔴 Collect constants into one file
     🔴 Make configurable
+  🔴 Assign unique ID to browser seesion
+  🔴 Inject OpenAI key via settings panel
+  🔴 Keep settings in localStorage
 
 🔴 Index generator
   🔴 Automatically show content page when topic is empty string
@@ -57,3 +64,11 @@
 
 🟢 Port longbridge data
 🔴 Return to lorum terminology?
+
+
+## Reference
+
+- Image analysis
+  - https://github.com/vikhyat/moondream
+  - https://platform.openai.com/docs/guides/vision
+

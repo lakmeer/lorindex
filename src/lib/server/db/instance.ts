@@ -7,19 +7,17 @@ import Database from 'better-sqlite3'
 import * as VSS from 'sqlite-vss'
 import fs from 'fs'
 
-import { warn, ok, info, log, error } from '$lib/log'
+import { warn, ok, info, log, error, debug } from '$lib/log'
 import { defer } from '$lib/utils'
 
 import { migrate } from '$lib/server/db/migrations'
 import { clean, refill, describe } from '$lib/server/db/housework'
 
-import { DB_NAME } from '$env/static/private'
+import { DB_NAME, FREEZE_MODE } from '$env/static/private'
 
-
-const PROTECT_DB = true
-const BACKUP_MODE : 'filesystem' | 'memory' = 'memory'
-
-const DB_PATH = `./src/lib/server/db/data/${DB_NAME}.db`
+const DB_FREEZE = false
+const DB_PATH   = `./src/lib/server/db/data/${DB_NAME}.db`
+const DB_VERBOSE = false
 
 
 //
@@ -34,19 +32,19 @@ export function total () {
 }
 
 function filesystemBackup () {
-  if (PROTECT_DB) {
+  if (DB_FREEZE) {
     if (fs.existsSync(DB_PATH + '.backup')) {
-      warn('db/init', 'restoring test database from backup')
+      warn('db/init/freeze', 'restoring database from backup')
       fs.copyFileSync(DB_PATH + '.backup', DB_PATH)
     } else {
-      warn('db/init', 'creating test database backup')
+      warn('db/init/freeze', 'creating database backup')
       fs.copyFileSync(DB_PATH, DB_PATH + '.backup')
     }
   }
 }
 
 function memoryBackup () {
-  info('db/init', 'copying test database to memory')
+  warn('db/init/freeze', 'copying database to memory')
 
   db.pragma('journal_mode = DELETE')
   const buffer = db.serialize()
@@ -75,13 +73,13 @@ if (!fs.existsSync(DB_PATH)) {
 
 info('db/init', `loading database '${DB_NAME}'`)
 
-if (PROTECT_DB && BACKUP_MODE === 'filesystem') filesystemBackup()
+if (DB_FREEZE && FREEZE_MODE === 'filesystem') filesystemBackup()
 
-let db = new Database(DB_PATH)
+let db = new Database(DB_PATH, DB_VERBOSE ? { verbose: (...args) => debug('db/sqlite', ...args) } : {})
 db.pragma('journal_mode = WAL')
 VSS.load(db)
 
-if (PROTECT_DB && BACKUP_MODE === 'memory') memoryBackup()
+if (DB_FREEZE && FREEZE_MODE === 'memory') memoryBackup()
 
 
 // Housework

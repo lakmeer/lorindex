@@ -1,0 +1,29 @@
+Given the follow snippet of text, identify several relevant tags that reflect the
+topics covered by the text. Give the tags one per line, in order of most-general first,
+following the provided example format. Avoid generic tags like colours and numbers.
+
+### Example Text
+
+Raspberries are a popular fruit known for their rich color and sweet, tangy taste. They
+belong to the genus Rubus, in the rose family. There are several species of raspberries,
+including red, black, purple, and yellow varieties. The red raspberry (Rubus idaeus) is
+the most commonly cultivated species. These small, heart-shaped berries are a composite
+fruit, consisting of many individual drupelets around a central core. Each drupelet
+contains a seed, contributing to the raspberry's textured feel.
+
+### Example Tags
+
+#raspberries
+#genus-rubus
+#fruit
+#druplets
+#seeds
+#tangy
+
+### Text
+
+{{text}}
+
+### Tags
+
+[[stop]]

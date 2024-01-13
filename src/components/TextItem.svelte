@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { postJson } from '$lib/utils'
-  import { error, ok, log } from '$lib/log.client'
+  import { postJson, isError } from '$lib/utils'
+  import { error, ok, log }    from '$lib/log.client'
 
-  import Item from '$comp/Item.svelte'
+  import ItemWrapper from '$comp/Item.svelte'
 
   export let id:       Item['id']
   export let time:     Item['time']
@@ -10,11 +10,33 @@
   export let desc:     Item['desc']
   export let distance: Item['distance']
   export let content:  Item['content'] = ""
+  export let tags:     Item['tags'] = []
+
   export const type:   Item['type'] = 'text'
 
   let status : Status = 'done'
 
+
+  async function reprocess () {
+    log('TextItem/reprocess', "Reprocessing", id)
+
+    status = 'pending'
+
+    const result = await postJson<string[]>('/api/reprocess', { id, content })
+
+    if (isError(result)) {
+      error('TextItem/reprocess', result.message)
+      status = 'modified'
+    } else {
+      tags = result.data
+      ok('TextItem/reprocess', ...result.data)
+      status = 'done'
+    }
+  }
+
   async function submit () {
+    log('TextItem/submit', "Submitting", id)
+
     if (status !== 'modified') return log('TextItem/submit', "Not modified")
     if (content.trim().length < 1) {
       status = 'done'
@@ -25,29 +47,30 @@
 
     const result = await postJson<Item>('/api/update', { id, hash, desc, content })
 
-    if (result.error) {
+    if (isError(result)) {
       error('TextItem/submit', result.message)
       status = 'modified'
     } else {
-      ok('TextItem/submit', 'saved')
       //@ts-ignore stupid
       const item = result.data
       hash = item.hash
       desc = item.desc
       time = item.time
+      tags = item.tags
 
-      ok('TextItem/submit', result)
+      ok('TextItem/submit', result.data)
       status = 'done'
     }
-	}
+  }
 </script>
 
 
-<Item type='text' {hash} {desc} {time} {distance} {status}>
+<ItemWrapper type='text' {hash} {desc} {time} {distance} {status} {tags}
+  on:reprocess={reprocess}>
   <div class="block w-full"
     on:input={() => status = 'modified'}
     on:blur={submit}
     contenteditable
     bind:textContent={content}>
   </div>
-</Item>
+</ItemWrapper>

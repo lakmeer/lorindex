@@ -51,6 +51,9 @@ export function postJson<T> (url:string, data:object):Promise<PostResult<T>> {
   })
 }
 
+export function isError (result:PostResult<any>): result is { error: true, message: string } {
+  return result.error
+}
 
 export function slugify (text:string):string {
   return text.toLowerCase().replace(/\s+/g, '-')
@@ -70,4 +73,27 @@ export function fillPrompt (prompt:string, data:object):string {
 export async function defer () {
   return new Promise(resolve => setTimeout(resolve, 0))
 }
+
+
+// Function timing
+
+type Timer = {
+  stop: () => number
+  ms:   () => string
+  s:    () => string
+}
+
+export function timer ():Timer {
+  let time = performance.now()
+
+  return {
+    stop: () =>   performance.now() - time,
+    ms:   () =>  (performance.now() - time).toFixed(3) + 'ms',
+    s:    () => ((performance.now() - time) / 1000).toFixed(3) + 's',
+  }
+}
+
+export const nQueries  = (n:number) => `(${ Array(n).fill('?').join(',') })`
+export const quotes    = (xs:string) => "'" + xs + "'"
+export const formatRow = (xs:any|any[]) => `('${ typeof xs === 'string' ? xs : xs.join("','")}')`
 

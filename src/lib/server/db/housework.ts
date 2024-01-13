@@ -1,6 +1,8 @@
 
+import MD5 from 'crypto-js/md5'
+
 import { embed, summary } from '$lib/openai'
-import { log, warn, ok } from '$lib/log'
+import { log, info, warn, ok } from '$lib/log'
 
 
 // Check for missing embeddings and fill them in
@@ -90,5 +92,15 @@ export function rehash (db:Db) {
   }
 
   ok('db/rehash', 'done')
+}
+
+
+// Reset: Empty a whole table and reset the autoincrement counter
+
+export function resetTable (db:Db, table:string) {
+  warn('db/reset', `clearing table '${table}'`)
+  db.prepare(`delete from ${table}`).run()
+  db.prepare(`delete from sqlite_sequence where name = ?`).run(table)
+  ok('db/reset', 'done')
 }
 

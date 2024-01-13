@@ -1,5 +1,7 @@
 import type { Database } from 'better-sqlite3'
 
+export {}
+
 declare global {
 
   // SvelteKit App
@@ -38,6 +40,7 @@ declare global {
     content?: string
     data?: Buffer
     distance: number
+    tags: string[]
   }
 
   type Settings = {
@@ -63,10 +66,12 @@ declare global {
     content: string
     embedding: Vector
     data: Buffer
+    tags: string[]
   }
 
   type QueryResult = ItemRow & {
     distance?: number
+    tags: string
   }
 
 
