@@ -81,10 +81,6 @@ async function init () {
 
   if (DB_FREEZE && FREEZE_MODE === 'memory') memoryBackup()
 
-
-  // Done
-
-  log('db/init', `loaded ${total()} items`)
   ok('db/init', 'done')
 }
 
