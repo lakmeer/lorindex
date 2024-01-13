@@ -1,4 +1,6 @@
 
+import db from '$db'
+
 import { unslugify } from '$lib/utils'
 import { info } from '$lib/log'
 

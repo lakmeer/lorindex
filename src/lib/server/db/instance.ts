@@ -10,9 +10,6 @@ import fs from 'fs'
 import { warn, ok, info, log, error, debug } from '$lib/log'
 import { defer } from '$lib/utils'
 
-import { migrate } from '$lib/server/db/migrations'
-import { clean, refill, describe, resetTable } from '$lib/server/db/housework'
-
 import { DB_NAME, FREEZE_MODE } from '$env/static/private'
 
 const DB_FREEZE  = true
@@ -61,39 +58,37 @@ function memoryBackup () {
 // Init Procedure
 //
 
-// Check that target exists
+let db:Db
 
-if (!fs.existsSync(DB_PATH)) {
-  warn('db/init', `database '${DB_NAME}' not found at ${DB_PATH}`)
-  warn('db/init', 'a new one will be created')
+async function init () {
+  // Check that target exists
+
+  if (!fs.existsSync(DB_PATH)) {
+    warn('db/init', `database '${DB_NAME}' not found at ${DB_PATH}`)
+    warn('db/init', 'a new one will be created')
+  }
+
+
+  // Create and configure
+
+  info('db/init', `loading database '${DB_NAME}'`)
+
+  if (DB_FREEZE && FREEZE_MODE === 'filesystem') filesystemBackup()
+
+  db = new Database(DB_PATH, DB_VERBOSE ? { verbose: (...args) => debug('db/sqlite', ...args) } : {})
+  db.pragma('journal_mode = WAL')
+  VSS.load(db)
+
+  if (DB_FREEZE && FREEZE_MODE === 'memory') memoryBackup()
+
+
+  // Done
+
+  log('db/init', `loaded ${total()} items`)
+  ok('db/init', 'done')
 }
 
+init()
 
-// Create and configure
+export { db as default }
 
-info('db/init', `loading database '${DB_NAME}'`)
-
-if (DB_FREEZE && FREEZE_MODE === 'filesystem') filesystemBackup()
-
-let db = new Database(DB_PATH, DB_VERBOSE ? { verbose: (...args) => debug('db/sqlite', ...args) } : {})
-db.pragma('journal_mode = WAL')
-VSS.load(db)
-
-if (DB_FREEZE && FREEZE_MODE === 'memory') memoryBackup()
-
-
-// Housework
-
-migrate(db)
-clean(db)
-
-await refill(db)
-await describe(db)
-
-
-// Done
-
-log('db/init', `loaded ${total()} items`)
-ok('db/init', 'done')
-
-export default db

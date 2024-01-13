@@ -11,9 +11,8 @@ import { warn, ok, info, log, error, debug } from '$lib/log'
 
 import { DEFAULT_LIMIT, DEFAULT_THRESHOLD } from '$lib/const'
 
-import db from '$lib/server/db/instance'
+import db from '$db/instance'
 import { resetTable } from '$db/housework'
-
 
 
 //
@@ -30,7 +29,7 @@ export function getItemById (id:number):Item {
     where items.id = ?
     group by items.id;`)
     .get(id) as QueryResult
-  debug('db/get', item)
+
   return xformItemRowToItem(item)
 }
 
@@ -116,7 +115,7 @@ export async function createTextItem (content:string, tags:string[] = []) {
 
   const item = getItemById(rowId)
 
-  ok('db/create', `created #${item.id}:${item.hash}`)
+  ok('db/create-text', `created #${item.id}:${item.hash}`)
 
   return item
 }
@@ -125,7 +124,7 @@ export async function createTextItem (content:string, tags:string[] = []) {
 // Update an existing item
 
 export async function updateTextItem (id:number, data:Partial<Item>):Promise<Item> {
-  info('db/update: updating item', id)
+  info('db/update-text: updating item', id)
 
   const hash = MD5(data.content).toString()
   const desc = await OpenAi.summary(db, data.content)
@@ -153,6 +152,32 @@ export async function updateTextItem (id:number, data:Partial<Item>):Promise<Ite
 }
 
 
+// New Image Item
+
+export async function createImageItem (data:Base64, desc:string, tags:string[] = []) {
+  const hash      = MD5(data).toString()
+  // 🔴 TODO: Auto-discover description via image model
+  const embedding = await OpenAi.embed(db, desc)
+
+  info('db/create-image', 'creating image item', hash, data.length)
+
+  const { lastInsertRowid } = db.prepare(`
+    insert into items (type, hash, desc, data) values (?, ?, ?, ?)`)
+    .run('image', hash, desc, data)
+
+  const rowId = lastInsertRowid as number
+
+  db.prepare(`
+    insert into vss_items (rowid, embedding) values (?, ?)`)
+    .run(rowId, JSON.stringify(embedding))
+
+  addTags(rowId, tags)
+
+  return getItemById(rowId)
+}
+
+
+
 //
 // Tagging
 //
@@ -160,6 +185,8 @@ export async function updateTextItem (id:number, data:Partial<Item>):Promise<Ite
 // Add new tags
 
 export function addTags (id:number, tags:string[]) {
+
+  if (tags.length === 0) return
 
   db.prepare(`
     insert or ignore into tags (tag)
@@ -226,6 +253,7 @@ export function xformItemRowToItem (row:QueryResult):Item {
     desc:     row.desc,
     content:  row.content,
     distance: row.distance || 1,
+    data:     row.data,
     tags:     row.tags?.split(',') || [],
   }
 }

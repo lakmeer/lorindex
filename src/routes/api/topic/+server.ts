@@ -1,7 +1,7 @@
 
 import type { RequestHandler } from './$types'
 
-import { allItems, getItemsByTopic } from '$lib/server/db/items'
+import { allItems, getItemsByTopic } from '$db/items'
 import { unslugify } from '$lib/utils'
 import { log }       from '$lib/log'
 

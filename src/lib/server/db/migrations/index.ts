@@ -1,5 +1,5 @@
 
-import { log, info, warn, ok } from '$lib/log'
+import { log, info, warn, ok, error } from '$lib/log'
 import fs from 'fs'
 
 const DB_MIGRATIONS_PATH = './src/lib/server/db/migrations'
@@ -19,7 +19,7 @@ export function getMigrations () {
   return migrations
 }
 
-export function migrate (db:Db) {
+export async function migrate (db:Db) {
 
   const version = getUserVersion(db)
 
@@ -29,8 +29,38 @@ export function migrate (db:Db) {
     if (migration.version > version) {
       work = true
       info('db/migrate', 'running migration', migration.version, migration.name)
-      db.exec(migration.query)
-      setUserVersion(db, migration.version)
+
+      let success = false
+
+      switch (migration.type) {
+        case 'sql':
+          try {
+            db.exec(migration.query)
+            success = true
+          } catch (e) {
+            error('db/migrate', `migration ${migration.version} failed:`, e.message)
+            success = false
+          }
+          break
+
+        case 'script':
+          try {
+            success = await migration.script(db)
+          } catch (e) {
+            error('db/migrate', `migration ${migration.version} failed:`, e.message)
+            success = false
+          }
+          if (!success) error('db/migrate', `migration ${migration.version} failed`)
+          break
+
+        default: warn('db/migrate', `unknown migration type: ${migration.type}`)
+      }
+
+      if (success) {
+        setUserVersion(db, migration.version)
+      } else {
+        return error('db/migrate', `migration failed`)
+      }
     }
   }
 
@@ -71,12 +101,27 @@ const migrations:Migration[] = []
 for (const file of fs.readdirSync(DB_MIGRATIONS_PATH)) {
   const [ version, name, ext ] = file.split('.')
 
-  if (ext !== 'sql') continue
+  switch (ext) {
+    case 'sql':
+      migrations.push({
+        type: 'sql',
+        version: parseInt(version),
+        name: name,
+        query: fs.readFileSync(DB_MIGRATIONS_PATH + '/' + file, 'utf-8')
+      })
+      break
 
-  migrations.push({
-    version: parseInt(version),
-    name: name,
-    query: fs.readFileSync(DB_MIGRATIONS_PATH + '/' + file, 'utf-8')
-  })
+    case 'js':
+    case 'ts':
+      migrations.push({
+        type: 'script',
+        version: parseInt(version),
+        name: name,
+        script: (await import(/* @vite-ignore */ './' + file)).default
+      })
+
+    default:
+      warn('db/migrations', `unknown migration type: ${ext}`)
+  }
 }
 

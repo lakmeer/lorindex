@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { fly } from 'svelte/transition'
-  import { ok, warn, log, debug } from '$lib/log.client'
+  import { ok, warn, log } from '$lib/log.client'
   import { getJson, slugify } from '$lib/utils'
 
   import Topic       from '$comp/Topic.svelte'
   import TextItem    from '$comp/TextItem.svelte'
+  import ImageItem   from '$comp/ImageItem.svelte'
   import NewTextItem from '$comp/NewTextItem.svelte'
   import VSSControls from '$comp/VSSControls.svelte'
 
@@ -76,7 +77,11 @@
       {#each items as item, ix}
         {#key item.hash}
           <div in:fly={{ y: 20, duration: 200, delay: ix * 100 }}>
-            <TextItem {...item} />
+            {#if item.type === 'text'}
+              <TextItem {...item} />
+            {:else if item.type === 'image'}
+              <ImageItem {...item} />
+            {/if}
           </div>
         {/key}
       {/each}

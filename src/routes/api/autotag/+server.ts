@@ -2,7 +2,7 @@
 import type { RequestHandler } from './$types'
 
 import { info, ok } from '$lib/log'
-import { getItemById, autotag } from '$lib/server/db/items'
+import { getItemById, autotag } from '$db/items'
 
 
 //

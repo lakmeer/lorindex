@@ -30,6 +30,7 @@ declare global {
   type UnixTime = number
   type MD5Hash  = string
   type Vector   = number[1536]
+  type Base64   = string
 
   type Item = {
     id:   number
@@ -38,7 +39,7 @@ declare global {
     type: 'text' | 'image' | 'audio' | 'link'
     desc: string
     content?: string
-    data?: Buffer
+    data: Buffer
     distance: number
     tags: string[]
   }
@@ -52,9 +53,11 @@ declare global {
   // Database
 
   type Migration = {
+    type: string
     version: number
     name: string
-    query: string
+    query?: string
+    script?: (db:Db) => Promise<boolean>
   }
 
   type ItemRow = {
