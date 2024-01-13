@@ -29,7 +29,6 @@
     items  = await getJson('/api/topic/', { topic, limit, threshold })
     status = 'done'
     ok('Main/getItems', `${items.length} results for '${topic}'`)
-    debug('Main/getItems', items)
   }
 
   onMount(() => {

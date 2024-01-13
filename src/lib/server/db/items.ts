@@ -83,22 +83,6 @@ export async function getItemsByTopic (topic:string, k = DEFAULT_LIMIT, threshol
     ) as hits on items.rowid = hits.rowid and hits.distance <= ?;`)
     .all(JSON.stringify(query), k, threshold)
 
-  /*
-    select items.*, hits.distance, hits.rowid as rowid, tags_agg.tags
-    from items
-    join (
-      select item_tags.item_id, group_concat(tags.tag) as tags
-      from item_tags
-      join tags on item_tags.tag_id = tags.id
-      group by item_tags.item_id
-    ) as tags_agg on items.id = tags_agg.item_id
-    join (
-      select rowid, distance
-      from vss_items
-      where vss_search(embedding, ?)
-      limit ?
-    ) as hits on items.rowid = hits.rowid and hits.distance <= ?;`)
-*/
   ok('db/topic', topic, '-', items.length, 'items')
 
   return items.map(xformItemRowToItem)
