@@ -53,7 +53,7 @@ export async function migrate (db:Db) {
           if (!success) error('db/migrate', `migration ${migration.version} failed`)
           break
 
-        default: warn('db/migrate', `unknown migration type: ${migration.type}`)
+        default: warn('db/migrate', `unsupported migration type: ${migration.type}`)
       }
 
       if (success) {
@@ -101,6 +101,9 @@ const migrations:Migration[] = []
 for (const file of fs.readdirSync(DB_MIGRATIONS_PATH)) {
   const [ version, name, ext ] = file.split('.')
 
+  // Migration should start with a number
+  if (isNaN(parseInt(version))) continue
+
   switch (ext) {
     case 'sql':
       migrations.push({
@@ -122,7 +125,7 @@ for (const file of fs.readdirSync(DB_MIGRATIONS_PATH)) {
       break
 
     default:
-      warn('db/migrations', `unknown migration type: ${ext}`)
+      warn('db/migrations', `unknown migration type: '${ext}' in ${file}`)
   }
 }
 
