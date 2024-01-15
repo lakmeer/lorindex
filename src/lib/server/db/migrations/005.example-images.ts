@@ -10,9 +10,9 @@ import { info, debug, log, ok, warn, error } from '$lib/log'
 const path = (file:string) => './src/lib/server/db/data/' + file
 
 const TEST_DATA = [
-  { file: 'leopard.webp',   desc: 'A leopard reclining in a tree',  tags: ['leopard', 'big-cat'] },
-  { file: 'raspberry.webp', desc: 'A ripe red raspberry',           tags: ['raspberry', 'fruit'] },
-  { file: 'violin.webp',    desc: 'A violin on a white tablecloth', tags: ['violin', 'instrument'] },
+  { file: 'leopard.webp',   desc: 'A leopard in tall savannah grass', tags: ['leopard', 'big-cat'] },
+  { file: 'raspberry.webp', desc: 'A ripe red raspberry',             tags: ['raspberry', 'fruit'] },
+  { file: 'violin.webp',    desc: 'A violin on a white tablecloth',   tags: ['violin', 'instrument'] },
 ]
 
 export default async function (db:Db):Promise<boolean> {

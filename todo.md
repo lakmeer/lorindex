@@ -4,13 +4,16 @@
 ## Features
 
 🟡 Image Items
-  🔴 Add image items
+  🟢 Add image items
   🔴 Semantic analysis of images
-  🔴 Embed generated anaylsis in OpenAI embedding space
+    🔴 Store descriptions in the 'contnet' field not used by text
+    🔴 Embed generated anaylsis in OpenAI embedding space
+  🔴 Seems to be ok with mimetime-agnostic b64 encoding (data:,base64;...) but
+     might need 
 
 🔴 Usage stats
   🔴 Track in/out tokens when using AI endpoints
-  🔴 Associate
+  🔴 Associate per-token prices with relevant APIs
 
 🟡 Tags
   🟢 Add tags
@@ -59,12 +62,12 @@
   🟢 Protect test db using in-memory clone
 🔴 Cancel inflight requests when topic changes
 🟢 Use `vss_distance_l2` for `db/distance`
+🔴 Move env values to localStorage
 
 
 ## Eloryn
 
 🟢 Port longbridge data
-🔴 Return to lorum terminology?
 
 
 ## Reference
@@ -72,4 +75,6 @@
 - Image analysis
   - https://github.com/vikhyat/moondream
   - https://platform.openai.com/docs/guides/vision
+- Good local instruction-taking performance
+  - Mistral Instruct 0.2
 
