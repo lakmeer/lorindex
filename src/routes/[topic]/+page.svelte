@@ -3,19 +3,18 @@
   import { fly } from 'svelte/transition'
   import { ok, warn, log } from '$lib/log.client'
   import { getJson, slugify } from '$lib/utils'
+  import { getContext } from 'svelte'
+  import type { Writable } from 'svelte/store';
 
   import Topic       from '$comp/Topic.svelte'
   import TextItem    from '$comp/TextItem.svelte'
   import ImageItem   from '$comp/ImageItem.svelte'
   import NewTextItem from '$comp/NewTextItem.svelte'
-  import VSSControls from '$comp/VSSControls.svelte'
 
 
   export let data
 
-  let limit     = data.settings.limit
-  let threshold = data.settings.threshold
-
+  const settings = getContext('settings') as Writable<Settings>
 
   // Topic changes
 
@@ -24,10 +23,10 @@
   let status:Status = 'done'
 
   async function getItems (newTopic:string) {
-    log('Main/getItems', newTopic, limit, threshold)
+    log('Main/getItems', newTopic, $settings.limit, $settings.threshold)
     status = 'pending'
     topic  = newTopic
-    items  = await getJson('/api/topic/', { topic, limit, threshold })
+    items  = await getJson('/api/topic/', { topic, limit: $settings.limit, threshold: $settings.threshold })
     status = 'done'
     ok('Main/getItems', `${items.length} results for '${topic}'`)
   }
@@ -35,6 +34,8 @@
   onMount(() => {
     getItems(topic)
     history.replaceState({ topic }, '', '/' + slugify(topic))
+
+    return settings.subscribe(() => getItems(topic))
   })
 
 
@@ -57,38 +58,27 @@
     log('pushNewItem', item)
     items = items.concat(item)
   }
-
 </script>
 
 
-<main class="mx-auto flex min-h-screen">
-  <aside class="px-8 bg-slate-200 border-r border-slate-500 min-w-aside min-h-full">
-    <div class="h-32 grid items-center mt-1">
-      <VSSControls title={data.db} bind:limit bind:threshold on:change={() => getItems(topic)} />
-    </div>
-  </aside>
-
-  <article class="max-w-prose w-full px-8 xl:px-16 py-16 xl:text-lg">
-    <div class="mb-10 transition-opacity" class:opacity-50={status==='pending'}>
-      <Topic topic={topic} on:change={({ detail }) => getItems(detail) } />
-    </div>
-
-    <div class="space-y-6 mb-6">
-      {#each items as item, ix}
-        {#key item.hash}
-          <div in:fly={{ y: 20, duration: 200, delay: ix * 100 }}>
-            {#if item.type === 'text'}
-              <TextItem {...item} />
-            {:else if item.type === 'image'}
-              <ImageItem {...item} />
-            {/if}
-          </div>
-        {/key}
-      {/each}
-    </div>
-
-    <NewTextItem topic={topic} on:created={({ detail }) => pushNewItem(detail)} />
-  </article>
-</main>
-
 <svelte:window on:popstate={pop} />
+
+<div class="mb-10 transition-opacity" class:opacity-50={status==='pending'}>
+  <Topic topic={topic} on:change={({ detail }) => getItems(detail) } />
+</div>
+
+<div class="space-y-6 mb-6">
+  {#each items as item, ix}
+    {#key item.hash}
+      <div in:fly={{ y: 20, duration: 200, delay: ix * 100 }}>
+        {#if item.type === 'text'}
+          <TextItem {...item} />
+        {:else if item.type === 'image'}
+          <ImageItem {...item} />
+        {/if}
+      </div>
+    {/key}
+  {/each}
+</div>
+
+<NewTextItem topic={topic} on:created={({ detail }) => pushNewItem(detail)} />

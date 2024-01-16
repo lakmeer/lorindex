@@ -51,9 +51,14 @@ export function getItemByHash (hash:MD5Hash):Item {
 // Get items without topic correlation
 
 export function allItems (limit:number = DEFAULT_LIMIT):Item[] {
-  // 🔴 TODO: tags
   return db.prepare(`
-    select * from items limit ?`)
+    select * from items left join (
+      select item_tags.item_id, group_concat(tags.tag) as tags
+      from item_tags
+      join tags on item_tags.tag_id = tags.id
+      group by item_tags.item_id
+    ) as tags_agg on items.id = tags_agg.item_id
+    limit ?`)
     .all(limit)
     .map(xformItemRowToItem)
 }

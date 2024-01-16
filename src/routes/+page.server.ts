@@ -1,9 +1,19 @@
-import { redirect } from '@sveltejs/kit'
+
+import db from '$db/instance'
+
+console.log("Root", db)
+
+import { allItems } from '$db/items'
 
 
-// Redirect to topic page (for now)
 
-export async function load () {
-  throw redirect(302, '/everything')
+
+
+
+
+export async function load (context) {
+
+  return { 
+    items: await allItems()
+  }
 }
-  
