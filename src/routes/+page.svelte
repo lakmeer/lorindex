@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { slugify } from '$lib/utils'
+
   export let data;
 
-  let items = data.items
+  let topics = data.topics
 </script>
 
 
@@ -11,17 +13,11 @@
   </h1>
 </div>
 
-<div class="space-y-6 mb-6 text-sm">
+<div class="space-y-6 mb-6 text-base">
   <ul>
-    {#each items as item}
+    {#each topics as topic}
       <li class="grid gap-3" style:grid-template-columns="1fr 60px 1fr">
-        <span class="font-bold">{ item.desc } </span>
-        <span class="bg-green-300 py-1 px-2 text-center">{ item.type } </span>
-        <span class="flex flex-wrap">
-          {#each item.tags as tag}
-            <span class="bg-gray-200 py-1 px-2">{ tag }</span>
-          {/each}
-        </span>
+        <a href={slugify(topic)} class="text-blue-500 hover:text-blue-700">{ topic }</a>
       </li>
     {/each}
   </ul>

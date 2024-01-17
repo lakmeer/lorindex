@@ -12,9 +12,11 @@ import { OPENAI_API_KEY } from '$env/static/private'
 
 import SUMMARY_PROMPT from '$lib/openai/prompts/summary?raw'
 import AUTOTAG_PROMPT from '$lib/openai/prompts/autotag?raw'
+import TOPICS_PROMPT  from '$lib/openai/prompts/topics?raw'
 
 const { min } = Math
 
+const MIN_ITEMS_FOR_TOPICS = 4
 const MIN_TEXT_LENGTH = 20
 const MAX_AUTOTAGS    = 5
 
@@ -128,5 +130,43 @@ export async function autotag (db:Db, text:string):Promise<string[]> {
   ai('openai/autotag', `generated ${tags.length} tags in ${totalTime} ${tokens}tk`)
 
   return tags.slice(0, MAX_AUTOTAGS)
+}
+
+
+// Topic Identification
+
+export async function topicsId (db:Db, summaries:string[]):Promise<string[]> {
+
+  if (summaries.length < MIN_ITEMS_FOR_TOPICS) {
+    warn('openai/topics', `too few items: ${summaries.length}`)
+    return ""
+  }
+
+  const t = timer()
+
+  const completion = await openai.completions.create({
+    model: 'gpt-3.5-turbo-instruct',
+    prompt: fillPrompt(TOPICS_PROMPT, { text: '-' + summaries.join('\n- ') }),
+    temperature: 0.1,
+    max_tokens: 256,
+    stop: ['\n\n', '###'],
+  })
+
+  const rawTopics = completion.choices[0].text.trim()
+
+  ai('openai/topics', rawTopics)
+
+  const totalTime = t.s()
+  const tokens    = completion.usage.prompt_tokens + '+' + completion.usage.completion_tokens
+
+  const topics = rawTopics
+    .split('\n')
+    .filter(it => it.length > 0)
+    .map(it => it.replace(/^-\s?/, '').trim())
+
+  ai('openai/topics', topics)
+  ai('openai/topics', `generated ${topics.length} topics in ${totalTime} ${tokens}tk`)
+
+  return topics
 }
 

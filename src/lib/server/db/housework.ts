@@ -2,7 +2,7 @@
 import MD5 from 'crypto-js/md5'
 
 import { embed, summary } from '$lib/openai'
-import { log, info, warn, ok } from '$lib/log'
+import { log, info, warn, ok, error } from '$lib/log'
 
 
 // Check for missing embeddings and fill them in
@@ -79,13 +79,22 @@ export function rehash (db:Db) {
   info('db/rehash', 'recomputing md5 hashes')
 
   const items = db.prepare(`
-    select hash, content from items`)
+    select type,hash,content,data from items`)
     .all()
 
   for (const item of items) {
-    const newHash = MD5(item.content).toString()
+    let newHash:string
+
+    switch (item.type) {
+      case 'text':  newHash = MD5(item.content).toString(); break;
+      case 'image': newHash = MD5(item.data).toString(); break;
+      default: error('db/rehash', `unknown item type '${item.type}'`); continue;
+    }
+   
     if (item.hash === newHash) continue
+
     info('db/rehash', `#${item.hash} -> #${newHash}`)
+
     db.prepare(`
       update items set hash = ? where hash = ?`)
       .run(newHash, item.hash)

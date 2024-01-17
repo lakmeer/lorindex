@@ -1,4 +1,4 @@
-Given the follow snippet of text, identify several relevant tags that reflect the
+Given the following snippet of text, identify several relevant tags that reflect the
 topics covered by the text. Give the tags one per line, in order of most-general first,
 following the provided example format. Avoid generic tags like colours and numbers.
 

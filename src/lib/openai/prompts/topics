@@ -1,0 +1,13 @@
+Here is a list of titles of short articles in the corpus of work. As an experienced data 
+scientist, machine learning researcher, and expert in the HDBSCAN clustering algorithm,
+cluster these articles into broader topics. Cluster aggressively, excluding nested subtopics
+and listing as few topics as reasonably covers the scope of the articles. Format the
+list with bullets.
+
+### Article Titles
+
+{{text}}
+
+### Topics Covered
+
+[[stop]]

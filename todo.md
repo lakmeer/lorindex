@@ -41,6 +41,7 @@
 🔴 Index generator
   🔴 Automatically show content page when topic is empty string
   🔴 Use the content table to identify and hyperlink words in displayed items
+  🔴 Topic discovery
 
 
 ## Improvements
@@ -63,6 +64,13 @@
 🔴 Cancel inflight requests when topic changes
 🟢 Use `vss_distance_l2` for `db/distance`
 🔴 Move env values to localStorage
+🔴 Experiment:
+  1. Split item text into sentences
+  2. Embed sentances directly
+  3. Embed whole text
+  4. Find average position of sentance embedding vectors
+  5. Compare distance to whole-text embedding
+
 
 
 ## Eloryn

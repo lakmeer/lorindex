@@ -1,5 +1,10 @@
 
-// WAsync
+// Lil' Helpers
+
+export const pluck = (key:string) => (xs:object) => xs[key]
+
+
+// Async
 
 export async function defer () {
   return new Promise(resolve => setTimeout(resolve, 0))
