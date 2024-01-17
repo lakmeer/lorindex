@@ -135,11 +135,11 @@ export async function autotag (db:Db, text:string):Promise<string[]> {
 
 // Topic Identification
 
-export async function topicsId (db:Db, summaries:string[]):Promise<string[]> {
+export async function topics (db:Db, summaries:string[]):Promise<string[]> {
 
   if (summaries.length < MIN_ITEMS_FOR_TOPICS) {
     warn('openai/topics', `too few items: ${summaries.length}`)
-    return ""
+    return []
   }
 
   const t = timer()

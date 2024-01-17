@@ -96,7 +96,7 @@ export async function getItemsByTopic (topic:string, k = DEFAULT_LIMIT, threshol
 
 // Find table of topics (llm)
 
-import { topicsId } from '$lib/openai'
+import { topics } from '$lib/openai'
 
 export async function discoverTopics () {
 
@@ -107,7 +107,7 @@ export async function discoverTopics () {
 
   info('items/discover-topics', 'items', items.length, items)
 
-  return topicsId(db, items)
+  return topics(db, items)
 
 }
 
