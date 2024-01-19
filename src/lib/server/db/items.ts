@@ -94,74 +94,6 @@ export async function getItemsByTopic (topic:string, k = DEFAULT_LIMIT, threshol
 }
 
 
-// Find table of topics (llm)
-
-import { topics } from '$lib/openai'
-
-export async function discoverTopics () {
-
-  const items = db.prepare(`
-    select desc from items;`)
-    .pluck()
-    .all()
-
-  info('items/discover-topics', 'items', items.length, items)
-
-  return topics(db, items)
-
-}
-
-
-// Find table of topics (pca + hdbscan)
-// 🔴 WIP: This is not working yet, or I'm not sure how to apply the results. The
-// provided clustering doesnt appear meaningful. Might work better with much more data.
-
-/*
-import { UMAP } from 'umap-js'
-import Clustering from 'hdbscanjs';
-import { pluck } from '$lib/utils'
-
-export function discoverTopicsHdbscan () {
-  log('items/discover-topics',)
-
-  // 1. Get all items, with embeddings
-  const items = db.prepare(`
-    select items.rowid,items.desc,vss_items.embedding from items
-    join vss_items on items.rowid = vss_items.rowid
-    where type is 'text';`)
-    .all()
-
-  // 2. Reduce embeddings to 50-ish dimensions
-  const umap = new UMAP({ nComponents: 100, nNeighbors: 4 })
-  const data = umap.fit(items.map((row) => row.embedding))
-                   .map((vector, ix) => ({ data: vector, opt: items[ix] }))
-
-  // 3. Cluster embeddings
-  const cluster = new Clustering(data, Clustering.distFunc.euclidean)
-  const treeNode = cluster.getTree()
-
-  let topics = []
-  warn('items/discover-topics')
-
-  function traverse (node, level = 0, path = []) {
-    if (node.left) {
-      traverse(node.left, level + 1, path.concat(node.opt))
-    }
-    if (node.right) {
-      traverse(node.right, level + 1, path.concat(node.opt))
-    }
-    if (!node.left && !node.right) {
-      topics.push(path)
-    }
-
-    info('items/discover-topics', level, node.data.length) //'\n' + node.opt.map(ix => ix + '. ' + items[ix].desc).join('\n'))
-  }
-
-  traverse(treeNode)
-
-  return []
-}
-*/
 
 //
 // Write
@@ -311,6 +243,71 @@ export async function distance (item:Item, topic:string):Promise<number> {
 
   return result ?? 1
 }
+
+
+// Find table of topics (llm)
+
+export async function discoverTopics ():Promise<string[]> {
+  const items = db.prepare(`
+    select desc from items;`)
+    .pluck()
+    .all()
+  info('items/discover-topics', items.length, 'items')
+  return await OpenAi.topics(db, items)
+}
+
+
+// Find table of topics (pca + hdbscan)
+// 🔴 WIP: This is not working yet, or I'm not sure how to apply the results. The
+// provided clustering doesnt appear meaningful. Might work better with much more data.
+
+/*
+import { UMAP } from 'umap-js'
+import Clustering from 'hdbscanjs';
+import { pluck } from '$lib/utils'
+
+export function discoverTopicsHdbscan () {
+  log('items/discover-topics',)
+
+  // 1. Get all items, with embeddings
+  const items = db.prepare(`
+    select items.rowid,items.desc,vss_items.embedding from items
+    join vss_items on items.rowid = vss_items.rowid
+    where type is 'text';`)
+    .all()
+
+  // 2. Reduce embeddings to 50-ish dimensions
+  const umap = new UMAP({ nComponents: 100, nNeighbors: 4 })
+  const data = umap.fit(items.map((row) => row.embedding))
+                   .map((vector, ix) => ({ data: vector, opt: items[ix] }))
+
+  // 3. Cluster embeddings
+  const cluster = new Clustering(data, Clustering.distFunc.euclidean)
+  const treeNode = cluster.getTree()
+
+  let topics = []
+  warn('items/discover-topics')
+
+  function traverse (node, level = 0, path = []) {
+    if (node.left) {
+      traverse(node.left, level + 1, path.concat(node.opt))
+    }
+    if (node.right) {
+      traverse(node.right, level + 1, path.concat(node.opt))
+    }
+    if (!node.left && !node.right) {
+      topics.push(path)
+    }
+
+    info('items/discover-topics', level, node.data.length) //'\n' + node.opt.map(ix => ix + '. ' + items[ix].desc).join('\n'))
+  }
+
+  traverse(treeNode)
+
+  return []
+}
+*/
+
 
 
 //

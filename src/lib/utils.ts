@@ -10,6 +10,10 @@ export async function defer () {
   return new Promise(resolve => setTimeout(resolve, 0))
 }
 
+export async function sleep (s:number) {
+  return new Promise(resolve => setTimeout(resolve, s * 1000))
+}
+
 export function debounce (delay:number, λ:Function) {
   let timer:NodeJS.Timeout
 

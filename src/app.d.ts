@@ -25,6 +25,28 @@ declare global {
   type Db = typeof Database
 
 
+  // Enums
+
+  type Status = 'modified' | 'pending' | 'done' | 'nothing'
+
+
+
+  // Application State
+
+  type AppState = {
+    index: string[],
+    topic: string
+    items: Item[]
+    query: string
+    tags: string[]
+  }
+
+  type Settings = {
+    limit: number
+    threshold: number
+  }
+
+
   // Domain Objects
 
   type UnixTime = number
@@ -42,11 +64,6 @@ declare global {
     data: Buffer
     distance: number
     tags: string[]
-  }
-
-  type Settings = {
-    limit: number
-    threshold: number
   }
 
 
@@ -78,10 +95,11 @@ declare global {
   }
 
 
-  // Other
+  // API
 
-  type Status = 'modified' | 'pending' | 'done' | 'nothing'
+  type PostResult<T> =
+    | { error: true, message: string }
+    | { error: false, data: T }
 
-  type PostResult<T> = { error: true, message: string } | { error: false, data: T }
 }
 

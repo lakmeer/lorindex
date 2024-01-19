@@ -84,9 +84,10 @@
 🔴 Better reveal animations
 🔴 Dynamically change items from currently loaded set as threshold slider is moved
   🔴 Submit new topic request only when slider is released
-🟢 Cache summaries
-🟢 Move embedding cache to db
+🟡 Cache summaries
+  🟢 Move embedding cache to db
   🟢 Protect test db using in-memory clone
+  🔴 Generalise `summary_cache` to `llm_cache` and store other completions
 🔴 Cancel inflight requests when topic changes
 🟢 Use `vss_distance_l2` for `db/distance`
 🔴 Move env values to localStorage
@@ -103,14 +104,16 @@
       block, which is not an item and won't be persisted
     - Assistant blocks should be visually distinct
   - Functions available to the assistant
-    - Retag stuff
-    - Delete stuff
-    - Get other items from another query
-    - Check for contradictions with other items
     - Inject other blocks into the view
       - Make the UI not remove injected blocks when the search settings change
       - Injected blocks will be forgotten when topic changes
         - Or not??
+    - Retag stuff
+    - Delete stuff
+    - Check for contradictions with other items
+
+
+## Assistant examples
 
 
 ## Eloryn

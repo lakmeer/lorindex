@@ -10,12 +10,16 @@
 		"sourceMap": true,
 		"strict": false,
     "paths": {
-      "$lib":    [ "./src/lib" ],
-      "$lib/*":  [ "./src/lib/*" ],
-      "$db":     [ "./src/lib/server/db" ],
-      "$db/*":   [ "./src/lib/server/db/*" ],
-      "$comp":   [ "./src/components" ],
-      "$comp/*": [ "./src/components/*" ],
+      "$lib":      [ "./src/lib" ],
+      "$lib/*":    [ "./src/lib/*" ],
+      "$db":       [ "./src/lib/server/db" ],
+      "$db/*":     [ "./src/lib/server/db/*" ],
+      "$panes":    [ "./src/panes" ],
+      "$panes/*":  [ "./src/panes/*" ],
+      "$comp":     [ "./src/components" ],
+      "$comp/*":   [ "./src/components/*" ],
+      "$stores":   [ "./src/stores/" ],
+      "$stores/*": [ "./src/stores/*" ],
     }
 	}
 }

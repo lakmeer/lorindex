@@ -135,6 +135,13 @@ export async function autotag (db:Db, text:string):Promise<string[]> {
 
 // Topic Identification
 
+const processTopics = (rawTopics:string) => {
+  return rawTopics
+    .split('\n')
+    .filter(it => it.length > 0)
+    .map(it => it.replace(/^-\s?/, '').trim())
+}
+
 export async function topics (db:Db, summaries:string[]):Promise<string[]> {
 
   if (summaries.length < MIN_ITEMS_FOR_TOPICS) {
@@ -144,29 +151,34 @@ export async function topics (db:Db, summaries:string[]):Promise<string[]> {
 
   const t = timer()
 
+  const text = '-' + summaries.join('\n- ')
+  const hash = MD5(text).toString()
+
+  let rawTopics = getCachedSummary(db, hash)
+
+  if (rawTopics) {
+    log('openai/topics', `${hash} is cached`)
+    return processTopics(rawTopics)
+  }
+
   const completion = await openai.completions.create({
     model: 'gpt-3.5-turbo-instruct',
-    prompt: fillPrompt(TOPICS_PROMPT, { text: '-' + summaries.join('\n- ') }),
+    prompt: fillPrompt(TOPICS_PROMPT, { text }),
     temperature: 0.1,
     max_tokens: 256,
     stop: ['\n\n', '###'],
   })
 
-  const rawTopics = completion.choices[0].text.trim()
+  rawTopics = completion.choices[0].text.trim()
 
-  ai('openai/topics', rawTopics)
+  saveCachedSummary(db, hash, rawTopics)
 
   const totalTime = t.s()
   const tokens    = completion.usage.prompt_tokens + '+' + completion.usage.completion_tokens
 
-  const topics = rawTopics
-    .split('\n')
-    .filter(it => it.length > 0)
-    .map(it => it.replace(/^-\s?/, '').trim())
+  const topics = processTopics(rawTopics)
 
-  ai('openai/topics', topics)
   ai('openai/topics', `generated ${topics.length} topics in ${totalTime} ${tokens}tk`)
-
   return topics
 }
 

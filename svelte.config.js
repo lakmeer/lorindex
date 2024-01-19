@@ -7,8 +7,10 @@ export default {
 	kit: {
 		adapter: adapter(),
     alias: {
-      '$db':   './src/lib/server/db/',
-      '$comp': './src/components/',
+      '$db':     './src/lib/server/db/',
+      '$comp':   './src/components/',
+      '$panes':  './src/panes/',
+      '$stores': './src/stores/',
     }
 	}
 }
