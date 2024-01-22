@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores'
+  import { unslugify } from '$lib/utils'
 
   import app from '$stores/app'
 
@@ -6,32 +8,20 @@
   import TopicPane from '$panes/Topic.svelte'
   import IndexPane from '$panes/Index.svelte'
 
-
-  //🔴 Unify url scheme
-  //
-  // - /                   Topic index
-  // - /<topic>            Show topic results
-  // - /#tags              Any items with matching tags
-  // - /<topic>#tags       Filter topic items by tags
-  // - /<topic>!type       Filter topic items by type
-  // - /?question          Results of an assistant question
-  // - /<topic>?question   Topic items, plus results of question           
-
-
-
-
+  page.subscribe(page => {
+    $app.topic = unslugify(page.params.topic)
+  })
 </script>
 
 
 <div class="mb-10 transition-opacity">
-  <TitleInput topic={$app.topic || 'Table of Contents'} />
+  <TitleInput bind:topic={$app.topic} />
 </div>
 
 <div class="space-y-6 mb-6">
   {#if $app.topic}
-    <TopicPane topic={$app.topic} />
+    <TopicPane />
   {:else}
     <IndexPane />
   {/if}
 </div>
-

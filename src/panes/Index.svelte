@@ -18,7 +18,7 @@
   <ul>
     {#each index as topic}
       <li class="grid gap-3" style:grid-template-columns="1fr 60px 1fr">
-        <a href={slugify(topic)} class="text-blue-500 hover:text-blue-700">{ topic }</a>
+        <a href={'/'+slugify(topic)} class="text-blue-500 hover:text-blue-700">{ topic }</a>
       </li>
     {/each}
   </ul>

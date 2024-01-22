@@ -12,8 +12,9 @@
   let items = []
   let status = writable<Status>('none')
 
-  onMount(async () => {
-    items = await API.getItemsForTopic(status, $app.topic)
+  onMount(() => {
+    return app.subscribe(async ({ topic }) =>
+      items = await API.getItemsForTopic(status, topic))
   })
 </script>
 

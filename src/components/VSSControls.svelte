@@ -1,17 +1,7 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
-  import { postJson } from '$lib/utils'
-
   export let title:string
   export let limit:number
   export let threshold:number
-
-  const dispatch = createEventDispatcher()
-
-  function changed () {
-    dispatch('change', { limit, threshold })
-    postJson('/api/settings', { limit, threshold })
-  }
 </script>
 
 
@@ -32,7 +22,6 @@
       id="limit"
       type="range"
       min="1" max="50" step="1"
-      on:change={changed}
       bind:value={limit} />
   </div>
 
@@ -45,7 +34,6 @@
       id="threshold"
       type="range" 
       min="0" max="1" step="0.01" 
-      on:change={changed}
       bind:value={threshold} />
   </div>
 </div>
